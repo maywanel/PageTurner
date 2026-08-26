@@ -24,7 +24,7 @@ public class DemoApplication {
 				admin.setName("mohamed");
 				admin.setEmail("mouhamedelmessadi@gmail.com");
 				admin.setPassword(passwordEncoder.encode("simo6206"));
-				admin.setAdmin(true);
+				admin.setRole(User.Role.SUPER_ADMIN);
 				userRepository.save(admin);
 			}
 		};

@@ -1,5 +1,6 @@
 package com.example.demo.filter;
 
+import com.example.demo.config.TenantContextHolder;
 import com.example.demo.service.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,32 +29,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response,@NonNull FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        
+            
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
-
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            try {
-                username = jwtUtil.extractUsername(token);
-            } catch (Exception e) {
-                // Invalid token
+        String tenantId = null;
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                try {
+                    token = authHeader.substring(7);
+                    username = jwtUtil.extractUsername(token);
+                    tenantId = jwtUtil.extractTenantId(token);
+                    if (tenantId != null)
+                        TenantContextHolder.setTenantId(tenantId);
+                } catch (Exception e) {
+                    System.err.println("Error extracting username from token: " + e.getMessage());
+                }
             }
-        }
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            
-            if (jwtUtil.validateToken(token, username)) {
-                UsernamePasswordAuthenticationToken authToken = 
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtUtil.validateToken(token, username)) {
+                    UsernamePasswordAuthenticationToken authToken = 
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+            filterChain.doFilter(request, response);
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        filterChain.doFilter(request, response);
     }
 }

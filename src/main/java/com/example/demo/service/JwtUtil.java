@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -27,11 +28,21 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
-        return extractClaim(token, claims -> claims.getSubject());
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    // New: Extract the tenant ID from the payload
+    public String extractTenantId(String token) {
+        return extractClaim(token, claims -> claims.get("tenantId", String.class));
+    }
+
+    // New: Extract the role from the payload
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
     public Date extractExpiration(String token) {
-        return extractClaim(token, claims -> claims.getExpiration());
+        return extractClaim(token, Claims::getExpiration);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -51,11 +62,16 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username) {
+    // Updated: Accept the User object to pull necessary data
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        claims.put("tenantId", user.getTenantId());
+        claims.put("role", user.getRole().name());
+        
+        return createToken(claims, user.getEmail());
     }
 
+    // Updated: Removed the undefined 'user' references here
     private String createToken(Map<String, Object> claims, String subject) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);

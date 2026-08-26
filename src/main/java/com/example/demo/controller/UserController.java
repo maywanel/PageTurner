@@ -45,7 +45,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
             user.setName(name);
             user.setEmail(email);
-            user.setAdmin(false);
+            user.setRole(User.Role.USER);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(user);
@@ -73,7 +73,7 @@ public class UserController {
 
             HttpSession session = request.getSession(true);
             session.setAttribute("currentUser", user.getId());
-            session.setAttribute("isAdmin", user.isAdmin());
+            session.setAttribute("isAdmin", user.getRole() == User.Role.SUPER_ADMIN);
             session.setMaxInactiveInterval(30 * 60);
             
             return ResponseEntity.ok()
@@ -135,7 +135,7 @@ public class UserController {
     public ResponseEntity<?> updateAdminStatus(@PathVariable int id, @RequestBody Map<String, Boolean> body) {
         return userRepository.findById(id)
             .map(user -> {
-                user.setAdmin(body.getOrDefault("isAdmin", false));
+                user.setRole(body.getOrDefault("isAdmin", false) ? User.Role.SUPER_ADMIN : User.Role.USER);
                 userRepository.save(user);
                 return ResponseEntity.ok("Admin status updated!");
             })

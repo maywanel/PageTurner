@@ -33,9 +33,9 @@ public class AuthController {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setAdmin(false);
+        user.setRole(User.Role.USER);
         userRepository.save(user);
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user);
         return ResponseEntity.ok(new AuthResponse(token, "User registered successfully"));
     }
 
@@ -47,7 +47,7 @@ public class AuthController {
         User user = userOpt.get();
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) 
             return ResponseEntity.badRequest().body("Invalid email or password");
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user);
         return ResponseEntity.ok(new AuthResponse(token, "Login successful"));
     }
 }
