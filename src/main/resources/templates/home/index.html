@@ -183,7 +183,7 @@
             <a href="#" class="brand-logo"><span>📚</span> PageTurner</a>
             <div class="nav-links">
                 <a href="/settings" class="nav-btn">⚙️ Settings</a>
-                <a href="/admin" class="nav-btn admin">👑 Admin</a>
+                <a href="/admin" id="adminNavLink" class="nav-btn admin hidden">👑 Admin</a>
                 <a href="#" onclick="logout(event)" class="nav-btn logout">🚪 Logout</a>
             </div>
         </nav>
@@ -222,8 +222,31 @@
         let isViewMyLibrary = false;
 
         document.addEventListener('DOMContentLoaded', () => {
+            updateAdminNavVisibility();
             fetchBooks('bestsellers');
         });
+
+        function updateAdminNavVisibility() {
+            const userJson = sessionStorage.getItem('currentUser');
+            const adminNavLink = document.getElementById('adminNavLink');
+
+            if (!adminNavLink) {
+                return;
+            }
+
+            if (!userJson) {
+                adminNavLink.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const user = JSON.parse(userJson);
+                const isAdminUser = user.role === 'SUPER_ADMIN' || user.role === 'TENANT_ADMIN';
+                adminNavLink.classList.toggle('hidden', !isAdminUser);
+            } catch (error) {
+                adminNavLink.classList.add('hidden');
+            }
+        }
 
         // --- FETCH LOGIC ---
 

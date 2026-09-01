@@ -419,7 +419,7 @@
             
             const user = JSON.parse(userJson);
             
-            if (!user.admin) {
+            if (user.role !== 'SUPER_ADMIN' && user.role !== 'TENANT_ADMIN') {
                 // User is not an admin
                 window.location.href = '/error/403';
                 return;
@@ -462,7 +462,7 @@
                 })
                 .then(users => {
                     const totalUsers = users.length;
-                    const admins = users.filter(user => user.admin).length;
+                    const admins = users.filter(user => user.role === 'SUPER_ADMIN' || user.role === 'TENANT_ADMIN').length;
                     const regularUsers = totalUsers - admins;
                     
                     document.getElementById('totalUsers').textContent = totalUsers;
@@ -500,11 +500,12 @@
                     const recentUsers = users.slice(-5).reverse();
                     
                     activityDiv.innerHTML = recentUsers.map(user => `
-                        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 3px solid ${user.admin ? '#9C27B0' : '#2196F3'};">
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 3px solid ${(user.role === 'SUPER_ADMIN' || user.role === 'TENANT_ADMIN') ? '#9C27B0' : '#2196F3'};">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
                                     <span style="color: white; font-weight: bold; font-size: 1.1em;">${escapeHtml(user.name)}</span>
-                                    ${user.admin ? '<span class="admin-badge">ADMIN</span>' : ''}
+                                    ${user.role === 'SUPER_ADMIN' ? '<span class="admin-badge">SUPER ADMIN</span>' : ''}
+                                    ${user.role === 'TENANT_ADMIN' ? '<span class="admin-badge">TENANT ADMIN</span>' : ''}
                                 </div>
                                 <div style="color: rgba(255,255,255,0.7); font-size: 0.9em;">${escapeHtml(user.email)}</div>
                             </div>

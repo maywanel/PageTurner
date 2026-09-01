@@ -425,7 +425,7 @@
                         
                         // Redirect based on user role
                         setTimeout(() => {
-                            if (user.admin) {
+                            if (user.role === 'SUPER_ADMIN' || user.role === 'TENANT_ADMIN') {
                                 window.location.href = '/admin';
                             } else {
                                 window.location.href = '/home';

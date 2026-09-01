@@ -1,7 +1,5 @@
 package com.example.demo.model;
 
-import org.hibernate.annotations.TenantId;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +12,6 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @TenantId
     @Column(name = "tenant_id")
     private String tenantId;
 

@@ -17,7 +17,8 @@ public class User {
     private int id;
 
     private String name;
-    
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role = Role.USER;
 
@@ -26,7 +27,7 @@ public class User {
     
     private String password;
 
-    @Column(name = "tenant_id")
+    @Column(name = "tenant_id", unique = true)
     private String tenantId;
 
     public String getTenantId() { return tenantId; }
