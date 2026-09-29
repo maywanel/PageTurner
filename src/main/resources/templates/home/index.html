@@ -3,424 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PageTurner Books</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
-    <style>
-        :root {
-            --bg-start: #2b1055;
-            --bg-end: #7597de;
-            --card-bg: rgba(255, 255, 255, 0.12);
-            --accent: #ffb347;
-            --accent-2: #a8d8f0;
-            --success: #2ecc71;
-            --danger: #e74c3c;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Poppins', 'Segoe UI', sans-serif;
-            background: #02030a;
-            min-height: 100vh;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 30px 15px;
-            color: white;
-            overflow-x: hidden;
-        }
-        body > * { position: relative; z-index: 1; }
-        #space-bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            background: rgba(10, 10, 25, 0.65);
-            border-radius: 28px;
-            padding: 40px 50px;
-            box-shadow: 0 25px 60px rgba(15, 12, 41, 0.55);
-            backdrop-filter: blur(20px);
-            position: relative;
-            margin-top: 20px;
-        }
-
-        /* NAVBAR */
-        .navbar {
-            position: sticky;
-            top: 0; 
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: -40px -50px 40px -50px; 
-            padding: 20px 50px;
-            background: rgba(10, 10, 25, 0.95);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 28px 28px 0 0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
-
-        .brand-logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-
-        .nav-links { display: flex; gap: 12px; }
-
-        .nav-btn {
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.85);
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid transparent;
-        }
-        .nav-btn:hover { background: rgba(255, 255, 255, 0.15); color: white; transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.2); }
-        .nav-btn.logout { background: rgba(255, 107, 107, 0.1); color: #ff8e8e; }
-        .nav-btn.logout:hover { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
-        .nav-btn.admin { background: rgba(168, 216, 240, 0.1); color: var(--accent-2); }
-        .nav-btn.admin:hover { background: rgba(168, 216, 240, 0.25); }
-
-        /* HEADER & SEARCH */
-        header { text-align: center; margin-bottom: 35px; }
-        header h1 { font-size: clamp(2.2rem, 4vw, 3rem); letter-spacing: 1px; margin-bottom: 15px; }
-        header p { color: rgba(255, 255, 255, 0.8); font-size: 1.1rem; }
-
-        .controls-area { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 40px; }
-        .search-box { display: flex; gap: 10px; width: 100%; max-width: 600px; }
-        .search-input {
-            flex: 1; padding: 15px 25px; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1); color: white; font-size: 1rem; backdrop-filter: blur(5px);
-            transition: all 0.3s;
-        }
-        .search-input:focus { outline: none; background: rgba(255, 255, 255, 0.2); border-color: var(--accent-2); }
-        
-        .categories { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-        .cat-btn {
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.8); padding: 8px 16px; border-radius: 20px; cursor: pointer;
-            transition: all 0.2s; font-size: 0.9rem;
-        }
-        .cat-btn:hover, .cat-btn.active { background: var(--accent-2); color: #2b1055; border-color: var(--accent-2); font-weight: 600; }
-        .cat-btn.special { background: rgba(255, 179, 71, 0.2); color: var(--accent); border-color: var(--accent); }
-        .cat-btn.special:hover { background: var(--accent); color: #2b1055; }
-
-        /* RESULTS GRID */
-        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px; }
-        .results-title { font-size: 1.4rem; color: var(--accent); font-weight: 600; }
-
-        .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; min-height: 200px; }
-        
-        .book-card {
-            background: rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 15px; text-align: center;
-            transition: transform 0.3s, background 0.3s; border: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex; flex-direction: column; height: 500px; position: relative; overflow: hidden;
-        }
-        .book-card:hover { transform: translateY(-8px); background: rgba(255, 255, 255, 0.15); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        
-        .book-cover {
-            width: 100%; height: 280px; object-fit: cover; border-radius: 10px; margin-bottom: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); background: #2b1055; flex-shrink: 0;
-        }
-        
-        .book-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .book-title { 
-            font-size: 1rem; font-weight: 700; margin-bottom: 5px; color: white; line-height: 1.3;
-            display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;
-        }
-        .book-author { 
-            font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 10px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .book-meta { 
-            font-size: 0.8rem; color: var(--accent-2); opacity: 0.8; margin-bottom: 15px;
-            display: -webkit-box; line-clamp: 3; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;
-        }
-
-        /* ACTION BUTTON ON CARD */
-        .card-action-btn {
-            margin-top: auto;
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-        
-        .btn-save { background: rgba(114, 255, 121, 0.2); color: white; box-shadow: 0 4px 15px rgba(65, 255, 103, 0.3); }
-        .btn-save:hover { background: #48ff6c; transform: scale(1.02); }
-        
-        .btn-delete { background: rgba(231, 76, 60, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-delete:hover { background: var(--danger); color: white; }
-
-        .hidden { display: none; }
-        .state-msg { grid-column: 1 / -1; text-align: center; font-size: 1.2rem; color: rgba(255,255,255,0.6); padding: 40px; }
-        .btn-search { padding: 15px 30px; background: var(--accent-2); border: none; border-radius: 50px; cursor: pointer; font-weight: bold; color: #2b1055; }
-        .btn-search:hover { background: white; }
-    </style>
+    <meta name="theme-color" content="#284f3f">
+    <title>Discover · PageTurner</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/library.css">
+    <script src="/js/library.js" defer></script>
+    <script src="/js/ui.js" defer></script>
+    <script src="/js/session.js"></script>
 </head>
-<body>
-    <canvas id="space-bg" aria-hidden="true"></canvas>
-    
-    <div class="container">
-        <nav class="navbar">
-            <a href="#" class="brand-logo"><span>📚</span> PageTurner</a>
-            <div class="nav-links">
-                <a href="/settings" class="nav-btn">⚙️ Settings</a>
-                <a href="/admin" id="adminNavLink" class="nav-btn admin hidden">👑 Admin</a>
-                <a href="#" onclick="logout(event)" class="nav-btn logout">🚪 Logout</a>
+<body class="page-home">
+<a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar" aria-label="Main navigation">
+        <a class="brand-logo" href="/home"><span class="brand-mark" aria-hidden="true">P<span>t</span></span>PageTurner<span class="brand-dot">.</span></a>
+        <div class="nav-links">
+            <a href="/home" aria-current="page">Discover</a>
+            <a href="/settings">Account</a>
+            <a href="/admin" id="adminNavLink" class="hidden">Dashboard</a>
+            <a href="/login" id="logoutLink" class="logout">Sign out ↗</a>
+        </div>
+</nav>
+<div class="container">
+    <main id="main-content">
+        <header class="discovery-hero">
+            <div>
+                <p class="eyebrow">THE PAGETURNER READING ROOM</p>
+                <h1>A quiet corner.<br><em>A thousand worlds.</em></h1>
+                <p>Wander the shelves, find a story that speaks to you, and make a little room for your next favorite.</p>
             </div>
-        </nav>
-
-        <header>
-            <h1>Discover Your Next Story</h1>
-            <p>Explore the global catalog or view your collection.</p>
+            <div class="reading-room-art" aria-hidden="true">
+                <div class="room-arch"><div class="room-books"><i>POETRY</i><i>THE CLASSICS</i><i>WANDER</i><i>STORIES</i><i>ONE MORE CHAPTER</i><i>BOTANICA</i></div><div class="room-shelf"></div></div>
+                <span class="room-caption">A PLACE TO GET LOST. AND FIND YOURSELF.</span>
+            </div>
         </header>
-
-        <div class="controls-area">
-            <div class="search-box">
-                <input type="text" id="searchInput" class="search-input" placeholder="Search by title or author">
-                <button onclick="triggerSearch()" class="btn-search">Search</button>
+        <section class="controls-area" aria-label="Find books">
+            <form id="searchForm" class="search-box" role="search">
+                <label class="hidden-label" for="searchInput">Search by title or author</label>
+                <input type="search" id="searchInput" class="search-input" placeholder="A title, an author, a new adventure…" autocomplete="off" maxlength="200">
+                <button type="submit" class="btn-search">Search ↗</button>
+            </form>
+            <div class="categories" aria-label="Browse collections">
+                <button data-query="bestsellers" class="cat-btn active" aria-pressed="true">Discover all</button>
+                <button data-query="subject:fantasy" class="cat-btn" aria-pressed="false">Fantasy</button>
+                <button data-query="subject:science_fiction" class="cat-btn" aria-pressed="false">Sci-fi</button>
+                <button data-query="subject:mystery" class="cat-btn" aria-pressed="false">Mystery</button>
+                <button data-query="subject:romance" class="cat-btn" aria-pressed="false">Romance</button>
+                <button data-query="subject:history" class="cat-btn" aria-pressed="false">History</button>
+                <button id="savedBooks" class="cat-btn special" aria-pressed="false">♡ My bookshelf</button>
             </div>
-
-            <div class="categories">
-                <button onclick="fetchBooks('subject:fantasy')" class="cat-btn">🧙‍♂️ Fantasy</button>
-                <button onclick="fetchBooks('subject:sci-fi')" class="cat-btn">🚀 Sci-Fi</button>
-                <button onclick="fetchBooks('subject:mystery')" class="cat-btn">🕵️ Mystery</button>
-                <button onclick="fetchBooks('subject:romance')" class="cat-btn">💕 Romance</button>
-                <button onclick="fetchBooks('subject:history')" class="cat-btn">🏛️ History</button>
-                <button onclick="fetchMyLibrary()" class="cat-btn special">📚 Favorite</button>
-            </div>
-        </div>
-
-        <div class="results-header">
-            <div id="resultsTitle" class="results-title">Featured Books</div>
-        </div>
-
-        <div id="bookGrid" class="results-grid"></div>
-    </div>
-
-    <script>
-        // Global variable to store current book data
-        let currentBooks = [];
-        let isViewMyLibrary = false;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            updateAdminNavVisibility();
-            fetchBooks('bestsellers');
-        });
-
-        function updateAdminNavVisibility() {
-            const userJson = sessionStorage.getItem('currentUser');
-            const adminNavLink = document.getElementById('adminNavLink');
-
-            if (!adminNavLink) {
-                return;
-            }
-
-            if (!userJson) {
-                adminNavLink.classList.add('hidden');
-                return;
-            }
-
-            try {
-                const user = JSON.parse(userJson);
-                const isAdminUser = user.role === 'SUPER_ADMIN' || user.role === 'TENANT_ADMIN';
-                adminNavLink.classList.toggle('hidden', !isAdminUser);
-            } catch (error) {
-                adminNavLink.classList.add('hidden');
-            }
-        }
-
-        // --- FETCH LOGIC ---
-
-        async function fetchBooks(query) {
-            isViewMyLibrary = false; // We are in Search Mode
-            const grid = document.getElementById('bookGrid');
-            const title = document.getElementById('resultsTitle');
-            
-            grid.innerHTML = '<div class="state-msg">🔭 Scanning the library...</div>';
-            title.innerText = query.startsWith('subject:') ? `Category: ${capitalize(query.split(':')[1])}` : `Results for "${query}"`;
-
-            try {
-                const response = await fetch(`/books/search?query=${encodeURIComponent(query)}`);
-                if (!response.ok) throw new Error('API Error');
-                const books = await response.json();
-                renderBooks(books);
-            } catch (error) {
-                console.error(error);
-                grid.innerHTML = '<div class="state-msg" style="color: #ff6b6b">❌ Failed to fetch books. Try again.</div>';
-            }
-        }
-
-        async function fetchMyLibrary() {
-            isViewMyLibrary = true; // We are in Library Mode
-            const grid = document.getElementById('bookGrid');
-            const title = document.getElementById('resultsTitle');
-            
-            grid.innerHTML = '<div class="state-msg">💾 Loading your collection...</div>';
-            title.innerText = "My Saved Library";
-
-            try {
-                const response = await fetch(`/books`); 
-                if (!response.ok) throw new Error('DB Error');
-                const books = await response.json();
-                
-                if (books.length === 0) {
-                    grid.innerHTML = '<div class="state-msg">📭 Your library is empty.<br><span style="font-size: 0.9em; opacity: 0.7">Search for books to add them!</span></div>';
-                    return;
-                }
-                renderBooks(books);
-            } catch (error) {
-                console.error(error);
-                grid.innerHTML = '<div class="state-msg">❌ Could not load your library.</div>';
-            }
-        }
-
-        // --- RENDER LOGIC ---
-
-        function renderBooks(books) {
-            currentBooks = books; // Save to global variable
-            const grid = document.getElementById('bookGrid');
-            
-            if (!books || books.length === 0) {
-                grid.innerHTML = '<div class="state-msg">No books found.</div>';
-                return;
-            }
-
-            // Map each book to HTML
-            let allCardsHtml = books.map((book, index) => {
-                let coverUrl;
-                if (book.coverId) {
-                    coverUrl = `https://covers.openlibrary.org/b/id/${book.coverId}-L.jpg`;
-                } else if (book.isbn && book.isbn !== 'N/A') {
-                    coverUrl = `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`;
-                } else {
-                    coverUrl = `https://placehold.co/200x300/2b1055/ffffff?text=${encodeURIComponent(book.title)}`;
-                }
-
-                // Determine Button: "Save" or "Delete"
-                let actionButton;
-                if (isViewMyLibrary) {
-                    actionButton = `<button onclick="deleteBook(${book.id}, this, ${index})" class="card-action-btn btn-delete">🗑️</button>`;
-                } else {
-                    actionButton = `<button onclick="saveBook(${index}, this)" class="card-action-btn btn-save">❤️</button>`;
-                }
-
-                return `
-                    <div class="book-card">
-                        <img src="${coverUrl}" class="book-cover" alt="${book.title}" 
-                             onerror="this.src='https://placehold.co/200x300/2b1055/ffffff?text=No+Cover'">
-                        <div class="book-info">
-                            <div class="book-title">${book.title}</div>
-                            <div class="book-author">${book.author}</div>
-                            <div class="book-meta">${book.description ? book.description.substring(0, 30) + '...' : ''}</div>
-                        </div>
-                        ${actionButton}
-                    </div>
-                `;
-            }).join('');
-
-            grid.innerHTML = allCardsHtml;
-        }
-
-        // --- ACTION FUNCTIONS ---
-
-        async function saveBook(index, btn) {
-            const bookToSave = currentBooks[index];
-
-            const payload = {
-                title: bookToSave.title,
-                author: bookToSave.author,
-                description: bookToSave.description || "Imported from Open Library",
-                isbn: bookToSave.isbn || "N/A",
-                coverId: bookToSave.coverId || null,
-            };
-
-            try {
-                const response = await fetch('/books', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    const savedBook = await response.json();
-                    if (btn) {
-                        btn.innerHTML = '🗑️';
-                        btn.className = 'card-action-btn btn-delete';
-                        btn.onclick = function() { deleteBook(savedBook.id, btn, index); };
-                        btn.disabled = false;
-                        btn.style.background = '';
-                    }
-                } else {
-                    window.location.reload();
-                }
-            } catch (error) {
-                console.error(error);
-                window.location.reload();
-            }
-        }
-
-        async function deleteBook(id, btn, index) {
-            try {
-                const response = await fetch(`/books/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    if (isViewMyLibrary) 
-                        fetchMyLibrary();
-                    else if (btn && index !== undefined) {
-                        btn.innerHTML = '❤️';
-                        btn.className = 'card-action-btn btn-save';
-                        btn.onclick = function() { saveBook(index, btn); };
-                        btn.disabled = false;
-                        btn.style.background = '';
-                    }
-                } else {
-                    alert("Could not remove book.");
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        // --- HELPERS ---
-
-        function triggerSearch() {
-            const val = document.getElementById('searchInput').value.trim();
-            if (val) fetchBooks(val);
-        }
-        
-        document.getElementById('searchInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') triggerSearch();
-        });
-
-        function capitalize(s) {
-            return s.charAt(0).toUpperCase() + s.slice(1);
-        }
-
-        function logout(event) {
-            event.preventDefault();
-            fetch('/users/logout', { method: 'POST' })
-                .finally(() => window.location.href = '/login');
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
-    <script src="/js/space-bg.js"></script>
+        </section>
+        <section class="library-collection" aria-labelledby="resultsTitle">
+            <div class="results-header"><h2 id="resultsTitle" class="results-title">From the library shelves</h2><div class="results-tools"><span id="resultsCount" class="results-count" role="status"></span><button id="previousBooks" class="btn btn-secondary" hidden>← Previous</button><button id="refreshBooks" class="btn btn-secondary">↻ New books</button></div></div>
+            <div id="shelfControls" class="shelf-controls" hidden><label for="readingFilter">Reading status</label><select id="readingFilter"><option value="ALL">All saved books</option><option value="WANT_TO_READ">Want to read</option><option value="READING">Reading</option><option value="FINISHED">Finished</option></select></div>
+            <div id="bookGrid" class="results-grid" aria-busy="true"></div>
+        </section>
+    </main>
+    <footer class="site-footer"><span>PageTurner · A home for your next chapter.</span><span>Book discovery powered by Open Library</span></footer>
+</div>
+<dialog id="bookDetails" class="database-dialog book-dialog" aria-labelledby="bookDetailsTitle"></dialog>
+<div id="libraryNotice" class="toast message" role="status" hidden></div>
 </body>
 </html>

@@ -3,332 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - User Management</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👤</text></svg>">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #02030a;
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-
-        body > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        #space-bg {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-        
-        .admin-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .admin-header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-        
-        .admin-header h1 {
-            color: white;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .admin-header p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1em;
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-        
-        .card h2 {
-            color: #a8d8f0;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-        
-        .user-form {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: flex-end;
-            margin-bottom: 20px;
-        }
-
-        .form-field {
-            flex: 1;
-            min-width: 200px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .form-field input {
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            color: #333;
-            width: 100%;
-        }
-        
-        .user-form input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(168, 216, 240, 0.5);
-        }
-
-        .password-note {
-            font-size: 0.8em;
-            color: rgba(255, 255, 255, 0.7);
-            font-style: italic;
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background: #a8d8f0;
-            color: #1a1a1a;
-        }
-        
-        .btn-primary:hover {
-            background: #7cc7e8;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-        
-        .btn-cancel {
-            background: #ff6b6b;
-            color: white;
-        }
-        
-        .btn-cancel:hover {
-            background: #ff5252;
-            transform: translateY(-2px);
-        }
-        
-        .users-table-container {
-            overflow-x: auto;
-        }
-        
-        .users-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .users-table th {
-            background: rgba(168, 216, 240, 0.2);
-            color: #a8d8f0;
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.9em;
-            letter-spacing: 1px;
-        }
-        
-        .users-table td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        
-        .users-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .admin-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        
-        .user-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .actions-cell {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-admin {
-            background: #FF9800;
-            color: white;
-        }
-        
-        .btn-admin:hover {
-            background: #F57C00;
-            transform: scale(1.05);
-        }
-        
-        .btn-admin.is-admin {
-            background: #9C27B0;
-        }
-        
-        .btn-admin.is-admin:hover {
-            background: #7B1FA2;
-        }
-        
-        .btn-edit {
-            background: #4CAF50;
-            color: white;
-        }
-        
-        .btn-edit:hover {
-            background: #45a049;
-            transform: scale(1.05);
-        }
-        
-        .btn-delete {
-            background: #f44336;
-            color: white;
-        }
-        
-        .btn-delete:hover {
-            background: #da190b;
-            transform: scale(1.05);
-        }
-        
-        .no-users {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.1em;
-        }
-        
-        .message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            z-index: 1000;
-            max-width: 300px;
-            word-wrap: break-word;
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        .message.success {
-            background: #4CAF50;
-        }
-        
-        .message.error {
-            background: #f44336;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes bgMove {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .user-form {
-                flex-direction: column;
-            }
-            
-            .form-field, .btn {
-                width: 100%;
-            }
-            
-            .users-table {
-                font-size: 0.9em;
-            }
-            
-            .users-table th, .users-table td {
-                padding: 10px;
-            }
-        }
-    </style>
+    <title>Members · PageTurner</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/library.css">
+    <script src="/js/session.js"></script>
 </head>
-<body>
-    <canvas id="space-bg" aria-hidden="true"></canvas>
-    <div class="admin-container">
+<body class="page-users">
+<a class="skip-link" href="#main-content">Skip to content</a><nav class="site-nav" aria-label="Main navigation"><a class="brand-logo" href="/home"><span class="brand-mark" aria-hidden="true">P<span>t</span></span>PageTurner<span class="brand-dot">.</span></a><div class="nav-links"><a href="/home">Discover</a><a href="/admin">Dashboard</a><a href="/admin/users">Members</a><a href="/systeminfo">System</a><a href="/settings">Account</a></div></nav>
+    <div class="admin-container" id="main-content" role="main">
         <div class="admin-header">
-            <h1>👥 User Management</h1>
+            <h1>User Management</h1>
             <p>Admin Panel - Manage users and permissions</p>
         </div>
-        
+
         <div class="card">
             <h2>Add New User</h2>
             <form id="userForm" class="user-form">
@@ -339,17 +27,17 @@
                 </div>
                 <div class="form-field">
                     <label for="userEmail">Email Address</label>
-                    <input type="email" id="userEmail" placeholder="Email Address" required />
+                    <input autocomplete="email" type="email" id="userEmail" placeholder="Email Address" required />
                 </div>
                 <div class="form-field">
                     <label for="userPassword">Password <span class="password-note" id="passwordNote">(min. 6 characters)</span></label>
-                    <input type="password" id="userPassword" placeholder="Password" minlength="6" required />
+                    <input autocomplete="new-password" type="password" id="userPassword" placeholder="Password" minlength="6" required />
                 </div>
                 <button type="submit" class="btn btn-primary" id="submitBtn">➕ Add User</button>
                 <button type="button" class="btn btn-cancel" id="cancelBtn" style="display: none;">❌ Cancel</button>
             </form>
         </div>
-        
+
         <div class="card">
             <h2>Users List</h2>
             <div class="users-table-container">
@@ -372,39 +60,32 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         let editingUserId = null;
-        
+        let loadedUsers = [];
+        function isAdmin(user) { return ['SUPER_ADMIN', 'TENANT_ADMIN'].includes(user.role); }
+
         document.addEventListener('DOMContentLoaded', function() {
             checkAdminAccess();
             loadUsers();
         });
-        
-        function checkAdminAccess() {
-            const userJson = sessionStorage.getItem('currentUser');
-            
-            if (!userJson) {
-                window.location.href = '/error/403';
-                return;
-            }
-            
-            const user = JSON.parse(userJson);
-            
-            if (!user.admin) {
-                window.location.href = '/error/403';
-                return;
-            }
+
+        async function checkAdminAccess() {
+            try {
+                const user = await PageTurnerSession.currentUser();
+                if (!['SUPER_ADMIN', 'TENANT_ADMIN'].includes(user.role)) location.replace('/error/403');
+            } catch { /* The shared session handler redirects expired sessions. */ }
         }
-        
+
         // Form submission handler
         document.getElementById('userForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const name = document.getElementById('userName').value.trim();
             const email = document.getElementById('userEmail').value.trim();
-            const password = document.getElementById('userPassword').value.trim();
-            
+            const password = document.getElementById('userPassword').value;
+
             if (!name || !email || (!password && !editingUserId)) {
                 showMessage('Please fill in all fields', 'error');
                 return;
@@ -414,19 +95,19 @@
                 showMessage('Password must be at least 6 characters', 'error');
                 return;
             }
-            
+
             if (editingUserId) {
                 updateUser(editingUserId, name, email, password);
             } else {
                 addUser(name, email, password);
             }
         });
-        
+
         // Cancel button handler
         document.getElementById('cancelBtn').addEventListener('click', function() {
             cancelEdit();
         });
-        
+
         // Load and display users
         function loadUsers() {
             fetch('/users')
@@ -442,58 +123,62 @@
                 .catch(error => {
                     console.error('Error loading users:', error);
                     showMessage('Error loading users: ' + error.message, 'error');
-                    document.getElementById('usersTableBody').innerHTML = 
+                    document.getElementById('usersTableBody').innerHTML =
                         '<tr><td colspan="5" class="no-users">Failed to load users</td></tr>';
                 });
         }
-        
+
         // Display users in the table
         function displayUsers(users) {
+            loadedUsers = users;
             const tbody = document.getElementById('usersTableBody');
-            
+
             if (users.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="no-users">No users found. Add some users to get started!</td></tr>';
                 return;
             }
-            
+
             tbody.innerHTML = users.map(user => `
                 <tr>
                     <td>${user.id}</td>
                     <td>${escapeHtml(user.name)}</td>
                     <td>${escapeHtml(user.email)}</td>
                     <td>
-                        ${user.admin ? 
-                            '<span class="admin-badge">👑 ADMIN</span>' : 
+                        ${isAdmin(user) ?
+                            '<span class="admin-badge">👑 ADMIN</span>' :
                             '<span class="user-badge">👤 USER</span>'
                         }
                     </td>
                     <td>
                         <div class="actions-cell">
-                            <button class="btn-small btn-admin ${user.admin ? 'is-admin' : ''}" 
-                                    onclick="toggleAdmin(${user.id}, ${user.admin})">
-                                ${user.admin ? '⬇️' : '⬆️'}
+                            <button class="btn-small btn-admin ${isAdmin(user) ? 'is-admin' : ''}"
+                                    onclick="toggleAdmin(${user.id}, ${isAdmin(user)})">
+                                ${isAdmin(user) ? 'PageTurnerte' : 'Promote'}
                             </button>
-                            <button class="btn-small btn-edit" 
-                                    onclick="editUser(${user.id}, '${escapeHtml(user.name)}', '${escapeHtml(user.email)}')">
-                                ✏️
+                            <button class="btn-small btn-edit"
+                                    onclick="editLoadedUser(${user.id})">
+                                Edit
                             </button>
-                            <button class="btn-small btn-delete" 
-                                    onclick="deleteUser(${user.id}, '${escapeHtml(user.name)}')">
-                                🗑️
+                            <button class="btn-small btn-delete"
+                                    onclick="deleteLoadedUser(${user.id})">
+                                Delete
                             </button>
                         </div>
                     </td>
                 </tr>
             `).join('');
         }
-        
+
+        function editLoadedUser(id) { const user = loadedUsers.find(user => user.id === id); if (user) editUser(id, user.name, user.email); }
+        function deleteLoadedUser(id) { const user = loadedUsers.find(user => user.id === id); if (user) deleteUser(id, user.name); }
+
         // Toggle admin status
         function toggleAdmin(id, currentStatus) {
             const action = currentStatus ? 'remove admin privileges from' : 'grant admin privileges to';
             if (!confirm(`Are you sure you want to ${action} this user?`)) {
                 return;
             }
-            
+
             fetch(`/users/${id}/admin`, {
                 method: 'PATCH',
                 headers: {
@@ -519,11 +204,11 @@
                 showMessage(error.message || 'Failed to toggle admin status', 'error');
             });
         }
-        
+
         // Add new user
         function addUser(name, email, password) {
             const userData = { name: name, email: email, password: password };
-            
+
             fetch('/users', {
                 method: 'POST',
                 headers: {
@@ -550,12 +235,14 @@
                 showMessage(error.message || 'Failed to add user', 'error');
             });
         }
-        
+
         // Edit user (populate form)
         function editUser(id, name, email) {
             editingUserId = id;
             document.getElementById('userId').value = id;
             document.getElementById('userName').value = name;
+            document.querySelector('.card h2').textContent = 'Edit user';
+            document.getElementById('userName').focus();
             document.getElementById('userEmail').value = email;
             document.getElementById('userPassword').value = '';
             document.getElementById('userPassword').placeholder = 'Leave empty to keep current password';
@@ -563,16 +250,16 @@
             document.getElementById('passwordNote').textContent = '(optional - leave empty to keep current)';
             document.getElementById('submitBtn').innerHTML = '💾 Update User';
             document.getElementById('cancelBtn').style.display = 'inline-block';
-            
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
+
         // Update user
         function updateUser(id, name, email, password) {
             const userData = { name: name, email: email };
             if (password)
                 userData.password = password;
-            
+
             fetch(`/users/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -599,13 +286,13 @@
                 showMessage(error.message || 'Failed to update user', 'error');
             });
         }
-        
+
         // Delete user
         function deleteUser(id, name) {
             if (!confirm(`Are you sure you want to delete user "${name}"?`)) {
                 return;
             }
-            
+
             fetch(`/users/${id}`, {
                 method: 'DELETE'
             })
@@ -627,10 +314,11 @@
                 showMessage(error.message || 'Failed to delete user', 'error');
             });
         }
-        
+
         // Cancel edit mode
         function cancelEdit() {
             editingUserId = null;
+            document.querySelector('.card h2').textContent = 'Add new user';
             clearForm();
             document.getElementById('userPassword').placeholder = 'Password';
             document.getElementById('userPassword').setAttribute('required', 'required');
@@ -638,7 +326,7 @@
             document.getElementById('submitBtn').innerHTML = '➕ Add User';
             document.getElementById('cancelBtn').style.display = 'none';
         }
-        
+
         // Clear form
         function clearForm() {
             document.getElementById('userId').value = '';
@@ -646,20 +334,22 @@
             document.getElementById('userEmail').value = '';
             document.getElementById('userPassword').value = '';
         }
-        
+
         // Show message to user
         function showMessage(message, type) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}`;
+            messageDiv.setAttribute('role', 'status');
             messageDiv.textContent = message;
-            
+            messageDiv.setAttribute('role', 'status');
+
             document.body.appendChild(messageDiv);
-            
+
             setTimeout(() => {
                 document.body.removeChild(messageDiv);
             }, 3000);
         }
-        
+
         // Escape HTML to prevent XSS
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -667,7 +357,6 @@
             return div.innerHTML;
         }
     </script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
-        <script src="/js/space-bg.js"></script>
+<script src="/js/ui.js" defer></script>
 </body>
 </html>

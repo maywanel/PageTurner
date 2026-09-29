@@ -1,3 +1,1 @@
--- Sample users with passwords
-INSERT INTO users (name, email, password, role) VALUES 
-('mohamed', 'mouhamedelmessadi@gmail.com', 'simo6206', 'SUPER_ADMIN')
+-- Accounts are created through registration or the optional environment-based admin bootstrap.

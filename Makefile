@@ -4,7 +4,7 @@ DOCKER ?= docker
 IMAGE_NAME ?= booklibrary
 IMAGE_TAG ?= java25
 CONTAINER_NAME ?= booklibrary
-DB_CONTAINER_NAME ?= demo-mysql
+DB_CONTAINER_NAME ?= PageTurner-mysql
 HOST_PORT ?= 8080
 CONTAINER_PORT ?= 8080
 
@@ -17,7 +17,7 @@ all: install run
 db-up:
 	@if [ -z "$$($(DOCKER) ps -q -f name=$(DB_CONTAINER_NAME))" ]; then \
 		echo "Starting MySQL container..."; \
-		$(DOCKER) start $(DB_CONTAINER_NAME) 2>/dev/null || $(DOCKER) run --name $(DB_CONTAINER_NAME) -e MYSQL_ROOT_PASSWORD=super_secret_root -e MYSQL_DATABASE=demo_db -e MYSQL_USER=student -e MYSQL_PASSWORD=student -p 3307:3306 -d mysql:8.0; \
+		$(DOCKER) start $(DB_CONTAINER_NAME) 2>/dev/null || $(DOCKER) run --name $(DB_CONTAINER_NAME) -e MYSQL_ROOT_PASSWORD=super_secret_root -e MYSQL_DATABASE=PageTurner_db -e MYSQL_USER=student -e MYSQL_PASSWORD=student -p 3307:3306 -d mysql:8.0; \
 		echo "Waiting for MySQL to initialize..."; \
 		sleep 10; \
 	fi

@@ -15,7 +15,7 @@ WORKDIR /app
 
 ENV SERVER_PORT=8080
 
-COPY --from=builder /workspace/target/demo-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=builder /workspace/target/PageTurner-0.0.1-SNAPSHOT.jar /app/app.jar
 
 EXPOSE 8080
 

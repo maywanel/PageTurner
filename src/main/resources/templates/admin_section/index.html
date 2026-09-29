@@ -3,353 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spring Boot</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👤</text></svg>">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>Library dashboard · PageTurner</title>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-            background: #02030a;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-x: hidden;
-        }
-
-        body > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        #space-bg {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-        
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            max-width: 600px;
-            width: 90%;
-        }
-        
-        h1 {
-            color: white;
-            font-size: 2.5em;
-            margin: 0 0 30px 0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            animation: fadeInUp 1s ease-out;
-        }
-        
-        .info-section {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-            text-align: left;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .info-item {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 15px 20px;
-            margin: 15px 0;
-            border-left: 4px solid #a8d8f0;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .info-item:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(5px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .info-icon {
-            width: 24px;
-            height: 24px;
-            background: #a8d8f0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #1a1a1a;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-        
-        .info-content {
-            flex: 1;
-            color: white;
-            font-size: 1.1em;
-        }
-        
-        .info-label {
-            font-weight: bold;
-            color: #a8d8f0;
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .info-value {
-            word-break: break-all;
-            font-family: 'Courier New', monospace;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 5px 10px;
-            border-radius: 5px;
-            color: #e0e0e0;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Hero Section Styles */
-        .hero-section {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .feature-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 25px 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-            color: inherit;
-        }
-        
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .feature-card:hover::before {
-            left: 100%;
-        }
-        
-        .feature-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-            border-color: rgba(168, 216, 240, 0.3);
-        }
-        
-        .stat-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .stat-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-        
-        .feature-icon {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-            display: block;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        }
-        
-        .feature-card h3 {
-            color: #a8d8f0;
-            font-size: 1.3em;
-            margin: 0 0 12px 0;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
-        
-        .feature-card p {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.95em;
-            line-height: 1.5;
-            margin: 0;
-        }
-        
-        .admin-btn {
-            background: #FF9800;
-            color: white;
-        }
-        
-        .admin-btn:hover {
-            background: #F57C00;
-            transform: scale(1.1);
-        }
-        
-        .admin-btn.is-admin {
-            background: #9C27B0;
-        }
-        
-        .admin-btn.is-admin:hover {
-            background: #7B1FA2;
-        }
-        
-        .admin-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            font-weight: bold;
-            margin-left: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #a8d8f0 0%, #7cc7e8 100%);
-            color: #1a1a1a;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(168, 216, 240, 0.4);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        .btn-danger {
-            background: rgba(244, 67, 54, 0.3);
-            color: white;
-            border: 2px solid rgba(244, 67, 54, 0.5);
-        }
-        
-        .btn-danger:hover {
-            background: rgba(244, 67, 54, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
-        }
-        
-        @media (max-width: 768px) {
-            .feature-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .feature-card {
-                padding: 20px 15px;
-            }
-            
-            .feature-icon {
-                font-size: 2em;
-            }
-        }
-    </style>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/library.css">
+    <script src="/js/session.js"></script>
 </head>
-<body>
-    <canvas id="space-bg" aria-hidden="true"></canvas>
-    <div class="container">
-        <h1 th:text="${message}">Default Welcome Message</h1>
-        
+<body class="page-admin_section">
+<a class="skip-link" href="#main-content">Skip to content</a><nav class="site-nav" aria-label="Main navigation"><a class="brand-logo" href="/home"><span class="brand-mark" aria-hidden="true">P<span>t</span></span>PageTurner<span class="brand-dot">.</span></a><div class="nav-links"><a href="/home">Discover</a><a href="/admin">Dashboard</a><a href="/admin/users">Members</a><a href="/systeminfo">System</a><a href="/settings">Account</a></div></nav>
+    <div class="container" id="main-content" role="main">
+        <p class="eyebrow">YOUR LIBRARY, AT A GLANCE</p><h1>Library dashboard</h1><p class="page-description">A little order for a world of stories. Manage your community and keep things running smoothly.</p>
+
         <!-- Admin Dashboard Overview -->
         <div class="hero-section">
-            <h2 style="color: #a8d8f0; margin: 0 0 25px 0; font-size: 1.8em; text-align: left;">📊 Dashboard Overview</h2>
-            
+            <h2 style="color: var(--green); margin: 0 0 25px 0; font-size: 1.8em; text-align: left;">Dashboard Overview</h2>
+
             <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 30px;">
                 <div class="stat-card" style="background: rgba(76, 175, 80, 0.2); border-left: 4px solid #4CAF50;">
                     <div class="stat-icon" style="font-size: 2em; margin-bottom: 10px;">👥</div>
-                    <div class="stat-value" id="totalUsers" style="font-size: 2em; font-weight: bold; color: white;">0</div>
-                    <div class="stat-label" style="color: rgba(255,255,255,0.8); font-size: 0.9em; margin-top: 5px;">Total Users</div>
+                    <div class="stat-value" id="totalUsers" style="font-size: 2em; font-weight: bold; color: var(--ink);">0</div>
+                    <div class="stat-label" style="color: var(--muted); font-size: 0.9em; margin-top: 5px;">Total Users</div>
                 </div>
                 <div class="stat-card" style="background: rgba(156, 39, 176, 0.2); border-left: 4px solid #9C27B0;">
                     <div class="stat-icon" style="font-size: 2em; margin-bottom: 10px;">👑</div>
-                    <div class="stat-value" id="totalAdmins" style="font-size: 2em; font-weight: bold; color: white;">0</div>
-                    <div class="stat-label" style="color: rgba(255,255,255,0.8); font-size: 0.9em; margin-top: 5px;">Admins</div>
+                    <div class="stat-value" id="totalAdmins" style="font-size: 2em; font-weight: bold; color: var(--ink);">0</div>
+                    <div class="stat-label" style="color: var(--muted); font-size: 0.9em; margin-top: 5px;">Admins</div>
                 </div>
                 <div class="stat-card" style="background: rgba(33, 150, 243, 0.2); border-left: 4px solid #2196F3;">
                     <div class="stat-icon" style="font-size: 2em; margin-bottom: 10px;">👤</div>
-                    <div class="stat-value" id="regularUsers" style="font-size: 2em; font-weight: bold; color: white;">0</div>
-                    <div class="stat-label" style="color: rgba(255,255,255,0.8); font-size: 0.9em; margin-top: 5px;">Regular Users</div>
+                    <div class="stat-value" id="regularUsers" style="font-size: 2em; font-weight: bold; color: var(--ink);">0</div>
+                    <div class="stat-label" style="color: var(--muted); font-size: 0.9em; margin-top: 5px;">Regular Users</div>
                 </div>
             </div>
-            
-            <h2 style="color: #a8d8f0; margin: 30px 0 20px 0; font-size: 1.8em; text-align: left;">🎯 Quick Actions</h2>
+
+            <h2 style="color: var(--green); margin: 30px 0 20px 0; font-size: 1.8em; text-align: left;">Quick Actions</h2>
 
             <div class="feature-grid">
                 <a href="/admin/users" class="feature-card" style="text-decoration: none; cursor: pointer;">
@@ -357,12 +45,12 @@
                     <h3>User Management</h3>
                     <p>View, add, edit, and manage all users and their permissions</p>
                 </a>
-                <div class="feature-card" onclick="showDatabaseStats()" style="cursor: pointer;">
+                <div class="feature-card" role="button" tabindex="0" onclick="showDatabaseStats()" style="cursor: pointer;">
                     <div class="feature-icon">💾</div>
-                    <h3>Database Stats</h3>
-                    <p>View database connection status and table information</p>
+                    <h3>Library Data</h3>
+                    <p>See a snapshot of your library’s user records</p>
                 </div>
-                <div class="feature-card" onclick="refreshStats()" style="cursor: pointer;">
+                <div class="feature-card" role="button" tabindex="0" onclick="refreshStats()" style="cursor: pointer;">
                     <div class="feature-icon">📈</div>
                     <h3>Refresh Stats</h3>
                     <p>Update dashboard statistics and data in real-time</p>
@@ -374,15 +62,15 @@
                 </a>
             </div>
         </div>
-        
+
         <!-- Recent Activity Section -->
         <div class="hero-section" style="margin-top: 30px;">
-            <h2 style="color: #a8d8f0; margin: 0 0 20px 0; font-size: 1.8em; text-align: left;">🕐 Recent Activity</h2>
+            <h2 style="color: var(--green); margin: 0 0 20px 0; font-size: 1.8em; text-align: left;">Recent Activity</h2>
             <div id="recentActivity" style="background: rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 20px; min-height: 100px;">
-                <p style="color: rgba(255,255,255,0.7); text-align: center; margin: 0;">Loading activity...</p>
+                <p style="color: var(--muted); text-align: center; margin: 0;">Loading activity...</p>
             </div>
         </div>
-        
+
         <!-- Action Buttons -->
         <div class="action-buttons">
             <a href="/settings" class="btn btn-primary">
@@ -399,56 +87,25 @@
             </button>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             checkAdminAccess();
             loadDashboardStats();
             loadRecentActivity();
         });
-        
+
         // Check if user has admin access
-        function checkAdminAccess() {
-            const userJson = sessionStorage.getItem('currentUser');
-            
-            if (!userJson) {
-                // No user logged in
-                window.location.href = '/error/403';
-                return;
-            }
-            
-            const user = JSON.parse(userJson);
-            
-            if (user.role !== 'SUPER_ADMIN' && user.role !== 'TENANT_ADMIN') {
-                // User is not an admin
-                window.location.href = '/error/403';
-                return;
-            }
+        async function checkAdminAccess() {
+            try {
+                const user = await PageTurnerSession.currentUser();
+                if (!['SUPER_ADMIN', 'TENANT_ADMIN'].includes(user.role)) location.replace('/error/403');
+            } catch { /* The shared session handler redirects expired sessions. */ }
         }
-        
-        function logout() {
-            // Call backend logout endpoint
-            fetch('/users/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(() => {
-                sessionStorage.removeItem('currentUser');
-                localStorage.removeItem('userEmail');
-                showMessage('Logging out...', 'success');
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 1000);
-            })
-            .catch(error => {
-                console.error('Logout error:', error);
-                // Still logout on frontend even if backend fails
-                sessionStorage.removeItem('currentUser');
-                localStorage.removeItem('userEmail');
-                window.location.href = '/login';
-            });
+
+        async function logout() {
+            try { await PageTurnerSession.logout(); }
+            catch (error) { showMessage(error.message, 'error'); }
         }
 
         // Load dashboard statistics
@@ -464,11 +121,11 @@
                     const totalUsers = users.length;
                     const admins = users.filter(user => user.role === 'SUPER_ADMIN' || user.role === 'TENANT_ADMIN').length;
                     const regularUsers = totalUsers - admins;
-                    
+
                     document.getElementById('totalUsers').textContent = totalUsers;
                     document.getElementById('totalAdmins').textContent = admins;
                     document.getElementById('regularUsers').textContent = regularUsers;
-                    
+
                     animateValue('totalUsers', 0, totalUsers, 1000);
                     animateValue('totalAdmins', 0, admins, 1000);
                     animateValue('regularUsers', 0, regularUsers, 1000);
@@ -490,51 +147,36 @@
                 })
                 .then(users => {
                     const activityDiv = document.getElementById('recentActivity');
-                    
+
                     if (users.length === 0) {
-                        activityDiv.innerHTML = '<p style="color: rgba(255,255,255,0.7); text-align: center; margin: 0;">No recent activity</p>';
+                        activityDiv.innerHTML = '<p style="color: var(--muted); text-align: center; margin: 0;">No recent activity</p>';
                         return;
                     }
-                    
+
                     // Show last 5 users (most recently added have higher IDs)
                     const recentUsers = users.slice(-5).reverse();
-                    
+
                     activityDiv.innerHTML = recentUsers.map(user => `
                         <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 3px solid ${(user.role === 'SUPER_ADMIN' || user.role === 'TENANT_ADMIN') ? '#9C27B0' : '#2196F3'};">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
-                                    <span style="color: white; font-weight: bold; font-size: 1.1em;">${escapeHtml(user.name)}</span>
+                                    <span style="color: var(--ink); font-weight: bold; font-size: 1.1em;">${escapeHtml(user.name)}</span>
                                     ${user.role === 'SUPER_ADMIN' ? '<span class="admin-badge">SUPER ADMIN</span>' : ''}
                                     ${user.role === 'TENANT_ADMIN' ? '<span class="admin-badge">TENANT ADMIN</span>' : ''}
                                 </div>
-                                <div style="color: rgba(255,255,255,0.7); font-size: 0.9em;">${escapeHtml(user.email)}</div>
+                                <div style="color: var(--muted); font-size: 0.9em;">${escapeHtml(user.email)}</div>
                             </div>
                         </div>
                     `).join('');
                 })
                 .catch(error => {
                     console.error('Error loading activity:', error);
-                    document.getElementById('recentActivity').innerHTML = 
-                        '<p style="color: rgba(255,255,255,0.7); text-align: center; margin: 0;">Failed to load activity</p>';
+                    document.getElementById('recentActivity').innerHTML =
+                        '<p style="color: var(--muted); text-align: center; margin: 0;">Failed to load activity</p>';
                 });
         }
 
-        // Animate counter
-        function animateValue(id, start, end, duration) {
-            const element = document.getElementById(id);
-            const range = end - start;
-            const increment = range / (duration / 16);
-            let current = start;
-            
-            const timer = setInterval(() => {
-                current += increment;
-                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-                    current = end;
-                    clearInterval(timer);
-                }
-                element.textContent = Math.round(current);
-            }, 16);
-        }
+        function animateValue(id, start, end) { document.getElementById(id).textContent = end; }
 
         // Refresh statistics
         function refreshStats() {
@@ -543,122 +185,45 @@
             loadRecentActivity();
         }
 
-        // Show database stats
         async function showDatabaseStats() {
+            const trigger = document.activeElement;
             try {
                 const response = await fetch('/users');
+                if (!response.ok) throw new Error('Unavailable');
                 const users = await response.json();
-                
-                const dbInfo = {
-                    'Database Type': 'MySQL',
-                    'Connection Status': '🟢 Connected',
-                    'Total Records': users.length,
-                    'Tables': 'users, book',
-                    'Last Query': new Date().toLocaleString()
-                };
-                
-                const message = Object.entries(dbInfo)
-                    .map(([key, value]) => `${key}: ${value}`)
-                    .join('\n');
-                
-                // Create custom modal
-                const modal = document.createElement('div');
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.7);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 10000;
-                    animation: fadeIn 0.3s ease-out;
-                `;
-                
-                modal.innerHTML = `
-                    <div style="
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        padding: 40px;
-                        border-radius: 20px;
-                        max-width: 500px;
-                        width: 90%;
-                        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-                        position: relative;
-                    ">
-                        <h2 style="color: white; margin: 0 0 25px 0; font-size: 2em; text-align: center;">
-                            💾 Database Statistics
-                        </h2>
-                        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 25px;">
-                            ${Object.entries(dbInfo).map(([key, value]) => `
-                                <div style="
-                                    background: rgba(255, 255, 255, 0.08);
-                                    border-radius: 10px;
-                                    padding: 15px 20px;
-                                    margin: 12px 0;
-                                    border-left: 4px solid #a8d8f0;
-                                ">
-                                    <div style="color: #a8d8f0; font-weight: bold; font-size: 0.9em; margin-bottom: 8px; text-transform: uppercase;">
-                                        ${key}
-                                    </div>
-                                    <div style="color: white; font-size: 1.1em; font-family: 'Courier New', monospace;">
-                                        ${value}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button onclick="this.parentElement.parentElement.remove()" style="
-                            width: 100%;
-                            margin-top: 25px;
-                            padding: 15px;
-                            background: rgba(255, 255, 255, 0.2);
-                            border: 2px solid rgba(255, 255, 255, 0.3);
-                            color: white;
-                            font-weight: bold;
-                            font-size: 1.1em;
-                            border-radius: 10px;
-                            cursor: pointer;
-                            transition: all 0.3s ease;
-                        " onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" 
-                           onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
-                            ✓ Close
-                        </button>
-                    </div>
-                `;
-                
-                document.body.appendChild(modal);
-                modal.onclick = (e) => {
-                    if (e.target === modal) modal.remove();
-                };
-                
-            } catch (error) {
-                console.error('Error loading database stats:', error);
-                showMessage('Failed to load database statistics', 'error');
-            }
+                const dialog = document.createElement('dialog');
+                dialog.className = 'database-dialog';
+                dialog.setAttribute('aria-labelledby', 'databaseTitle');
+                dialog.innerHTML = `<h2 id="databaseTitle">Library data</h2><p>A snapshot of the data available to your account.</p><div class="info-item"><span class="info-label">User records</span><span class="info-value">${users.length}</span></div><div class="info-item"><span class="info-label">Last checked</span><span class="info-value">${new Date().toLocaleTimeString()}</span></div><form method="dialog"><button class="btn">Close</button></form>`;
+                dialog.addEventListener('close', () => { dialog.remove(); trigger?.focus(); });
+                dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+                document.body.append(dialog);
+                dialog.showModal();
+            } catch { showMessage('Could not load library data. Please try again.', 'error'); }
         }
 
         // Show message to user
         function showMessage(message, type) {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message;
+            messageDiv.setAttribute('role', 'status');
             messageDiv.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
                 padding: 15px 20px;
                 border-radius: 8px;
-                color: white;
+                color: var(--ink);
                 font-weight: bold;
                 z-index: 1000;
                 max-width: 300px;
                 word-wrap: break-word;
                 animation: slideIn 0.3s ease-out;
-                ${type === 'success' ? 'background: #4CAF50;' : 'background: #f44336;'}
+                ${type === 'success' ? 'background: var(--green-light); color: var(--green);' : 'background: #faeee7; color: var(--danger);'}
             `;
-            
+
             document.body.appendChild(messageDiv);
-          
+
             setTimeout(() => {
                 document.body.removeChild(messageDiv);
             }, 3000);
@@ -671,7 +236,6 @@
             return div.innerHTML;
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
-    <script src="/js/space-bg.js"></script>
+<script src="/js/ui.js" defer></script>
 </body>
 </html>

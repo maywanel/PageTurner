@@ -3,295 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Management - Spring Boot</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #02030a;
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-
-        body > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        #space-bg {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .navbar {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 15px 30px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 16px rgba(31, 38, 135, 0.37);
-        }
-
-        .navbar h2 {
-            color: white;
-            font-size: 1.5em;
-        }
-
-        .btn-back {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-back:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .settings-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        .settings-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .settings-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .settings-header h1 {
-            color: white;
-            font-size: 2em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .settings-header p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.95em;
-        }
-
-        .user-info {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-
-        .user-info h3 {
-            color: #a8d8f0;
-            font-size: 1.1em;
-            margin-bottom: 15px;
-        }
-
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9em;
-        }
-
-        .info-value {
-            color: white;
-            font-weight: 600;
-        }
-
-        .password-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group label {
-            color: #a8d8f0;
-            font-weight: 600;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-            font-size: 1.2em;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px 12px 45px;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            color: #333;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(168, 216, 240, 0.5);
-            background: white;
-        }
-
-        .form-group input::placeholder {
-            color: #999;
-        }
-
-        .btn-update {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #a8d8f0 0%, #7cc7e8 100%);
-            color: #1a1a1a;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 10px;
-        }
-
-        .btn-update:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(168, 216, 240, 0.4);
-        }
-
-        .btn-update:active {
-            transform: translateY(0);
-        }
-
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .message.error {
-            background: rgba(244, 67, 54, 0.2);
-            color: white;
-            border: 1px solid rgba(244, 67, 54, 0.5);
-        }
-
-        .message.success {
-            background: rgba(76, 175, 80, 0.2);
-            color: white;
-            border: 1px solid rgba(76, 175, 80, 0.5);
-        }
-
-        .section-divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.2);
-            margin: 30px 0;
-        }
-
-        .section-title {
-            color: white;
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .settings-container {
-                padding: 30px 20px;
-            }
-
-            .navbar {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
-    </style>
+    <title>Account settings · PageTurner</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/library.css">
+    <script src="/js/session.js"></script>
 </head>
-<body>
-    <canvas id="space-bg" aria-hidden="true"></canvas>
-    <div class="navbar">
-        <h2>⚙️ Account Settings</h2>
-        <a href="/home" class="btn-back">← Back to Home</a>
-    </div>
+<body class="page-settings">
+<a class="skip-link" href="#main-content">Skip to content</a><nav class="site-nav" aria-label="Main navigation"><a class="brand-logo" href="/home"><span class="brand-mark" aria-hidden="true">P<span>t</span></span>PageTurner<span class="brand-dot">.</span></a><div class="nav-links"><a href="/home">Discover</a><a href="/admin">Dashboard</a><a href="/admin/users">Members</a><a href="/systeminfo">System</a><a href="/settings">Account</a></div></nav>
 
-    <div class="settings-container">
+
+    <div class="settings-container" id="main-content" role="main">
         <div class="settings-header">
             <span class="settings-icon">👤</span>
             <h1>Profile Settings</h1>
@@ -316,16 +38,16 @@
 
         <div class="section-divider"></div>
 
-        <h2 class="section-title">🔒 Change Password</h2>
+        <h2 class="section-title">Change Password</h2>
 
-        <div id="messageContainer"></div>
+        <div id="messageContainer" role="status" aria-live="polite"></div>
 
         <form class="password-form" id="passwordForm">
             <div class="form-group">
                 <label for="currentPassword">Current Password</label>
                 <div class="input-wrapper">
                     <span class="input-icon">🔓</span>
-                    <input type="password" id="currentPassword" placeholder="Enter your current password" required>
+                    <input autocomplete="current-password" type="password" id="currentPassword" placeholder="Enter your current password" required>
                 </div>
             </div>
 
@@ -333,7 +55,7 @@
                 <label for="newPassword">New Password</label>
                 <div class="input-wrapper">
                     <span class="input-icon">🔒</span>
-                    <input type="password" id="newPassword" placeholder="Enter your new password" required minlength="6">
+                    <input autocomplete="new-password" type="password" id="newPassword" placeholder="Enter your new password" required minlength="6">
                 </div>
             </div>
 
@@ -341,7 +63,7 @@
                 <label for="confirmNewPassword">Confirm New Password</label>
                 <div class="input-wrapper">
                     <span class="input-icon">🔐</span>
-                    <input type="password" id="confirmNewPassword" placeholder="Re-enter your new password" required>
+                    <input autocomplete="new-password" type="password" id="confirmNewPassword" placeholder="Re-enter your new password" required>
                 </div>
             </div>
 
@@ -353,31 +75,21 @@
         let currentUser = null;
 
         // Load user information on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            const userJson = sessionStorage.getItem('currentUser');
-            
-            if (!userJson) {
-                showMessage('Please login first', 'error');
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 2000);
-                return;
-            }
-
-            currentUser = JSON.parse(userJson);
-            
-            // Display user information
-            document.getElementById('userName').textContent = currentUser.name;
-            document.getElementById('userEmail').textContent = currentUser.email;
-            document.getElementById('userRole').textContent = currentUser.admin ? 'Administrator' : 'Regular User';
+        window.addEventListener('DOMContentLoaded', async function() {
+            try {
+                currentUser = await PageTurnerSession.currentUser();
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userEmail').textContent = currentUser.email;
+                document.getElementById('userRole').textContent = ['SUPER_ADMIN', 'TENANT_ADMIN'].includes(currentUser.role) ? 'Administrator' : 'Reader';
+            } catch { showMessage('Please sign in to view your account.', 'error'); }
         });
 
         document.getElementById('passwordForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const currentPassword = document.getElementById('currentPassword').value.trim();
-            const newPassword = document.getElementById('newPassword').value.trim();
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
 
             // Validation
             if (!currentPassword || !newPassword || !confirmNewPassword) {
@@ -425,13 +137,10 @@
                 })
                 .then(message => {
                     showMessage('Password updated successfully!', 'success');
-                    
+
                     // Clear the form
                     document.getElementById('passwordForm').reset();
-                    
-                    // Update stored user password (for demo purposes)
-                    currentUser.password = newPassword;
-                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
                 })
                 .catch(error => {
                     console.error('Password update error:', error);
@@ -441,14 +150,16 @@
 
         function showMessage(message, type) {
             const container = document.getElementById('messageContainer');
-            container.innerHTML = `<div class="message ${type}">${message}</div>`;
-            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type}`;
+            messageElement.textContent = message;
+            container.replaceChildren(messageElement);
+
             setTimeout(() => {
                 container.innerHTML = '';
             }, 5000);
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
-    <script src="/js/space-bg.js"></script>
+<script src="/js/ui.js" defer></script>
 </body>
 </html>
