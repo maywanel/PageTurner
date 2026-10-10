@@ -8,6 +8,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/css/library.css">
+    <script src="/js/bookshelf.js" defer></script>
     <script src="/js/library.js" defer></script>
     <script src="/js/ui.js" defer></script>
     <script src="/js/session.js"></script>
@@ -31,9 +32,24 @@
                 <h1>A quiet corner.<br><em>A thousand worlds.</em></h1>
                 <p>Wander the shelves, find a story that speaks to you, and make a little room for your next favorite.</p>
             </div>
-            <div class="reading-room-art" aria-hidden="true">
-                <div class="room-arch"><div class="room-books"><i>POETRY</i><i>THE CLASSICS</i><i>WANDER</i><i>STORIES</i><i>ONE MORE CHAPTER</i><i>BOTANICA</i></div><div class="room-shelf"></div></div>
-                <span class="room-caption">A PLACE TO GET LOST. AND FIND YOURSELF.</span>
+            <div class="reading-room-art">
+                <div class="room-arch" aria-hidden="true">
+                    <div class="book-stack">
+                        <i class="stack-book">THE CLASSICS<span>01</span></i>
+                        <i class="stack-book">WANDER<span>02</span></i>
+                        <i class="stack-book">BOTANICA<span>03</span></i>
+                        <i class="stack-book">POETRY<span>04</span></i>
+                        <i class="stack-book">ONE MORE CHAPTER<span>05</span></i>
+                    </div>
+                    <div class="room-shelf"></div>
+                </div>
+                <div class="room-art-footer">
+                    <span class="room-caption">A little stack of possibilities.</span>
+                    <button class="stack-replay" type="button" aria-label="Replay falling books animation" hidden>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg>
+                        <span>Replay</span>
+                    </button>
+                </div>
             </div>
         </header>
         <section class="controls-area" aria-label="Find books">
@@ -54,7 +70,12 @@
         </section>
         <section class="library-collection" aria-labelledby="resultsTitle">
             <div class="results-header"><h2 id="resultsTitle" class="results-title">From the library shelves</h2><div class="results-tools"><span id="resultsCount" class="results-count" role="status"></span><button id="previousBooks" class="btn btn-secondary" hidden>← Previous</button><button id="refreshBooks" class="btn btn-secondary">↻ New books</button></div></div>
-            <div id="shelfControls" class="shelf-controls" hidden><label for="readingFilter">Reading status</label><select id="readingFilter"><option value="ALL">All saved books</option><option value="WANT_TO_READ">Want to read</option><option value="READING">Reading</option><option value="FINISHED">Finished</option></select></div>
+            <div id="shelfControls" class="shelf-controls" hidden>
+                <div class="shelf-field shelf-search-field"><label for="shelfSearch">Search your bookshelf</label><input id="shelfSearch" type="search" placeholder="Title or author…" maxlength="200" autocomplete="off"></div>
+                <div class="shelf-field"><label for="readingFilter">Reading status</label><select id="readingFilter"><option value="ALL">All saved books</option><option value="WANT_TO_READ">Want to read</option><option value="READING">Reading</option><option value="FINISHED">Finished</option></select></div>
+                <div class="shelf-field"><label for="shelfSort">Sort by</label><select id="shelfSort"><option value="NEWEST">Recently saved</option><option value="OLDEST">Oldest saved</option><option value="TITLE_ASC">Title: A–Z</option><option value="TITLE_DESC">Title: Z–A</option><option value="AUTHOR">Author: A–Z</option><option value="STATUS">Reading status</option></select></div>
+                <button id="clearShelfFilters" type="button" class="btn btn-secondary">Reset</button>
+            </div>
             <div id="bookGrid" class="results-grid" aria-busy="true"></div>
         </section>
     </main>

@@ -148,3 +148,14 @@ All mutation requests require CSRF protection. API clients first request `GET /a
 5. Browser sessions are stored in application memory. A restart requires users to sign in again; multiple application instances require a shared session store before scaling horizontally.
 
 GitHub Actions runs `./mvnw verify` on Java 25. The tests include a real H2-backed API suite for ownership isolation, tampered IDs, reading statuses, CSRF, expired sessions, and role changes, plus paginated search and upstream failure tests.
+
+
+### Search, sorting, and reading
+
+In **My bookshelf**, search saved titles and authors, combine the search with reading-status filters, and sort by recently saved, oldest saved, title, author, or reading status. Search is case- and accent-insensitive. Refresh preserves the current controls; Reset clears them. All filtering is local to the already authorized personal collection.
+
+**Reading options** on a book opens its details and checks its ISBN through the [Open Library Read API](https://openlibrary.org/dev/docs/api/read). Readable editions open in the provider’s reader in a new tab; borrowable editions open the provider’s borrowing page. Borrowing may require an external account, and availability is confirmed by the provider. Different-edition matches are labeled. Missing ISBNs or unavailable editions offer an Open Library edition search instead of claiming the full text is available. Provider failures offer a retry. Reading links are restricted to HTTPS Open Library and Internet Archive URLs.
+
+`GET /books/reading?isbn=…` requires authentication, validates the ISBN format, and returns reading options without storing book content or altering reading status. No database migration is required for these features.
+
+Run `node --test src/test/js/*.test.cjs` for bookshelf filtering/sorting tests, and `./mvnw test` for the Java API and reading-provider tests. Both run in CI.

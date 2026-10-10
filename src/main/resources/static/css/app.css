@@ -10,7 +10,8 @@
     --gold:#b27c43;
     --danger:#a33f35;
     --radius:16px;
-    --shadow:0 12px 36px #263c3308
+    --shadow:0 12px 36px #263c3308;
+    --ease-out:cubic-bezier(0.23, 1, 0.32, 1)
 }
 
 * {
@@ -425,8 +426,8 @@ p {
     transition:transform .2s
 }
 
-.book-card:hover .book-cover {
-    transform:translateY(-4px)
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+    .book-card:hover .book-cover { transform:translateY(-4px); }
 }
 
 .cover-fallback {
@@ -523,14 +524,11 @@ p {
     border-radius:10px;
     background:linear-gradient(100deg,#e9ebe3 30%,#f5f5ee 50%,#e9ebe3 70%);
     background-size:200% 100%;
-    animation:shimmer 1.4s infinite
+    animation:loading-breath 1.4s ease-in-out 3
 }
 
-@keyframes shimmer {
-    to {
-    background-position:-200% 0
-}
-
+@keyframes loading-breath {
+    50% { opacity: .55; }
 }
 
 /* Forms and actions */
@@ -1363,7 +1361,8 @@ body>.message,.toast {
 @media(prefers-reduced-motion:reduce) {
     *,*::before,*::after {
     animation:none!important;
-    transition:none!important;
+    transition-property:color,background-color,border-color,opacity!important;
+    transition-duration:150ms!important;
     scroll-behavior:auto!important
 }
 
@@ -1404,4 +1403,43 @@ body>.message,.toast {
     .results-header { align-items: flex-start; flex-direction: column; }
     .results-tools { justify-content: flex-start; width: 100%; }
     .results-tools .results-count { flex-basis: 100%; }
+}
+
+/* Shared feedback: quick responses on controls, quiet continuity on overlays. */
+:is(.btn,.btn-search,.btn-login,.btn-signup,.btn-update,.btn-small,.cat-btn,.card-action-btn,.stack-replay,.home-button,.btn-back) {
+    transition: transform 140ms var(--ease-out), background-color 180ms ease, color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.nav-links a,.feature-card,input,select {
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+input,select { caret-color: var(--green); }
+@media (prefers-reduced-motion: no-preference) {
+    :is(.btn,.btn-search,.btn-login,.btn-signup,.btn-update,.btn-small,.cat-btn,.card-action-btn,.stack-replay,.home-button,.btn-back):active:not(:disabled):not(:focus-visible):not([aria-disabled="true"]) {
+        transform: scale(.97);
+    }
+}
+.database-dialog {
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+    transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out), display 200ms allow-discrete, overlay 200ms allow-discrete;
+}
+.database-dialog[open] { opacity: 1; transform: none; }
+.database-dialog::backdrop {
+    opacity: 0;
+    transition: opacity 200ms ease, display 200ms allow-discrete, overlay 200ms allow-discrete;
+}
+.database-dialog[open]::backdrop { opacity: 1; }
+.toast,body > .message {
+    transition: opacity 200ms ease, transform 200ms var(--ease-out), display 200ms allow-discrete;
+}
+.toast[hidden],body > .message[hidden] { opacity: 0; transform: translateY(8px); }
+@starting-style {
+    .database-dialog[open] { opacity: 0; transform: translateY(8px) scale(.98); }
+    .database-dialog[open]::backdrop { opacity: 0; }
+    .toast,body > .message { opacity: 0; transform: translateY(8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .database-dialog,.toast,body > .message { transform: none !important; }
 }

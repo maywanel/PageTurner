@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/main/resources/static/css/library.css"
+        ],
+        "createdAt": "2026-10-10T18:53:42.049Z",
+        "reason": "Agent reviewed: the cover-fallback border represents a physical book spine in the existing wooden bookshelf design; the mobile rule adjusts that spine to 5px. This is domain-appropriate book artwork, not a card accent."
+      }
+    ]
+  }
+}

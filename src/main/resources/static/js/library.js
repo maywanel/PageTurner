@@ -7,6 +7,8 @@
     const previous = document.getElementById('previousBooks');
     const filter = document.getElementById('readingFilter');
     const dialog = document.getElementById('bookDetails');
+    const shelfSearch = document.getElementById('shelfSearch');
+    const shelfSort = document.getElementById('shelfSort');
     const statuses = {WANT_TO_READ: 'Want to read', READING: 'Reading', FINISHED: 'Finished'};
     let activeRequest, noticeTimer;
     let libraryView = false, currentPage = 1, currentQuery = 'bestsellers', currentBooks = [];
@@ -44,15 +46,18 @@
         }
         grid.replaceChildren(state);
     }
+    function resetShelfFilters() {
+        shelfSearch.value = ''; filter.value = 'ALL'; shelfSort.value = 'NEWEST';
+        renderCollection();
+    }
     function renderCollection() {
-        const visible = libraryView && filter.value !== 'ALL'
-            ? currentBooks.filter(book => (book.readingStatus || 'WANT_TO_READ') === filter.value) : currentBooks;
-        count.textContent = libraryView ? `${visible.length} ${visible.length === 1 ? 'book' : 'books'} saved` : `${currentBooks.length} books · Selection ${currentPage}`;
+        const visible = libraryView ? PageTurnerBookshelf.select(currentBooks, {query: shelfSearch.value, status: filter.value, sort: shelfSort.value}) : currentBooks;
+        count.textContent = libraryView ? `${visible.length} of ${currentBooks.length} saved books` : `${currentBooks.length} books · Selection ${currentPage}`;
         if (!visible.length) {
             const filtered = libraryView && currentBooks.length > 0;
-            emptyState(filtered ? 'No books at this stage yet.' : libraryView ? 'Make room for your favorites.' : 'A different story awaits.',
-                filtered ? 'Change a book’s reading status to organize your collection.' : libraryView ? 'Save a book from Discover and you’ll find it here.' : 'Try another title, author, or genre.',
-                filtered ? 'Show all saved books' : 'Explore books', filtered ? () => { filter.value = 'ALL'; renderCollection(); } : () => loadBooks('bestsellers'));
+            emptyState(filtered ? 'No books match your search.' : libraryView ? 'Make room for your favorites.' : 'A different story awaits.',
+                filtered ? 'Try a different title, author, or reading status.' : libraryView ? 'Save a book from Discover and you’ll find it here.' : 'Try another title, author, or genre.',
+                filtered ? 'Show all saved books' : 'Explore books', filtered ? resetShelfFilters : () => loadBooks('bestsellers'));
         } else grid.replaceChildren(...visible.map(renderBook));
     }
     async function loadBooks(query = currentQuery, personal = false, page = 1) {
@@ -142,11 +147,54 @@
         dialog.append(heading, node('p', '', `By ${book.author || 'Unknown author'}`), coverFrame(book), node('p', 'detail-description', book.description || 'No additional description is available for this edition.'));
         if (book.isbn && book.isbn !== 'N/A') dialog.append(node('p', '', `ISBN: ${book.isbn}`));
         dialog.append(node('p', 'detail-status', savedBook ? `On your bookshelf · ${statuses[savedBook.readingStatus || 'WANT_TO_READ']}` : 'Save this book to track your reading progress.'));
+        const reading = node('section', 'reading-options');
+        reading.setAttribute('aria-label', 'Read this book');
+        dialog.append(reading);
+        loadReadingOptions(book, reading);
         const close = node('button', 'btn', 'Close details');
         close.addEventListener('click', () => dialog.close());
         dialog.append(close);
         dialog.addEventListener('close', () => trigger?.focus(), {once: true});
         dialog.showModal();
+    }
+    function externalLink(label, url) {
+        const link = node('a', 'btn btn-secondary reading-link', label + ' ↗');
+        link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+        return link;
+    }
+    async function loadReadingOptions(book, section) {
+        const isbn = String(book.isbn || '').replace(/[\s-]/g, '').toUpperCase();
+        const fallback = () => externalLink('Find an edition on Open Library',
+            `https://openlibrary.org/search?title=${encodeURIComponent(book.title || '')}&author=${encodeURIComponent(book.author || '')}`);
+        section.replaceChildren(node('h3', '', 'Read this book'));
+        if (!/^(?:[0-9]{9}[0-9X]|[0-9]{13})$/.test(isbn)) {
+            section.append(node('p', '', 'This book has no edition identifier to check. Find an edition to see reading options.'), fallback());
+            return;
+        }
+        const message = node('p', '', 'Checking for a readable edition…');
+        message.setAttribute('role', 'status'); section.append(message);
+        try {
+            const result = await fetch(`/books/reading?isbn=${encodeURIComponent(isbn)}`).then(jsonResponse);
+            if (!section.isConnected) return;
+            message.textContent = result.options.length
+                ? 'Opens in a new tab. Borrowing may require an Open Library account; availability is confirmed by the provider.'
+                : 'No readable or borrowable edition was found for this ISBN. You can look for another edition.';
+            for (const option of result.options) {
+                // Defense in depth: only open the documented providers, even if a response is malformed.
+                let url;
+                try { url = new URL(option.url); } catch { continue; }
+                if (url.protocol !== 'https:' || !['archive.org', 'www.archive.org', 'openlibrary.org', 'www.openlibrary.org'].includes(url.hostname) || url.username || url.password) continue;
+                section.append(externalLink(option.label, url.href));
+                if (option.differentEdition) section.append(node('small', 'reading-edition-note', 'This is a different edition of the same work.'));
+            }
+            if (!result.options.length) section.append(fallback());
+        } catch (error) {
+            if (!section.isConnected) return;
+            message.textContent = error.message;
+            const retry = node('button', 'btn btn-secondary', 'Try again');
+            retry.addEventListener('click', () => loadReadingOptions(book, section));
+            section.append(retry, fallback());
+        }
     }
     dialog.addEventListener('click', event => {
         const bounds = dialog.getBoundingClientRect();
@@ -215,7 +263,10 @@
         coverButton.setAttribute('aria-label', `Open ${book.title || 'book'} details`);
         coverButton.addEventListener('click', () => showDetails(book));
         coverButton.append(coverFrame(book));
-        card.append(coverButton, info, button);
+        const read = node('button', 'card-action-btn reading-action', 'Reading options');
+        read.setAttribute('aria-label', `Reading options for ${book.title || 'book'}`);
+        read.addEventListener('click', () => showDetails(book));
+        card.append(coverButton, info, read, button);
         return card;
     }
     document.getElementById('searchForm').addEventListener('submit', event => {
@@ -227,7 +278,12 @@
     document.getElementById('savedBooks').addEventListener('click', () => loadBooks(currentQuery, true));
     refresh.addEventListener('click', () => loadBooks(currentQuery, libraryView, libraryView ? 1 : currentPage >= 100 ? 1 : currentPage + 1));
     previous.addEventListener('click', () => loadBooks(currentQuery, false, Math.max(1, currentPage - 1)));
-    filter.addEventListener('change', renderCollection);
+    filter.addEventListener('change', () => { if (libraryView && grid.getAttribute('aria-busy') !== 'true') renderCollection(); });
+    shelfSearch.addEventListener('input', () => { if (libraryView && grid.getAttribute('aria-busy') !== 'true') renderCollection(); });
+    shelfSort.addEventListener('change', () => { if (libraryView && grid.getAttribute('aria-busy') !== 'true') renderCollection(); });
+    document.getElementById('clearShelfFilters').addEventListener('click', () => {
+        if (libraryView && grid.getAttribute('aria-busy') !== 'true') resetShelfFilters();
+    });
     document.getElementById('logoutLink').addEventListener('click', async event => {
         event.preventDefault();
         try { await PageTurnerSession.logout(); } catch (error) { notify(error.message, true); }

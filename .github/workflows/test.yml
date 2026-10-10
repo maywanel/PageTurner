@@ -10,4 +10,8 @@ jobs:
           distribution: temurin
           java-version: '25'
           cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test src/test/js/*.test.cjs
       - run: ./mvnw --batch-mode verify

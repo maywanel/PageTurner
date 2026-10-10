@@ -15,12 +15,22 @@ RERUN_POLL_INTERVAL ?= 1
 all: install run
 
 db-up:
-	@if [ -z "$$($(DOCKER) ps -q -f name=$(DB_CONTAINER_NAME))" ]; then \
+	@set -e; \
+	running="$$($(DOCKER) ps -q -f 'name=^/$(DB_CONTAINER_NAME)$$')"; \
+	if [ -z "$$running" ]; then \
 		echo "Starting MySQL container..."; \
 		$(DOCKER) start $(DB_CONTAINER_NAME) 2>/dev/null || $(DOCKER) run --name $(DB_CONTAINER_NAME) -e MYSQL_ROOT_PASSWORD=super_secret_root -e MYSQL_DATABASE=PageTurner_db -e MYSQL_USER=student -e MYSQL_PASSWORD=student -p 3307:3306 -d mysql:8.0; \
-		echo "Waiting for MySQL to initialize..."; \
-		sleep 10; \
-	fi
+	fi; \
+	echo "Waiting for MySQL to be ready..."; \
+	attempts=0; \
+	until $(DOCKER) exec $(DB_CONTAINER_NAME) sh -c 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql --protocol=TCP -h 127.0.0.1 -u "$$MYSQL_USER" "$$MYSQL_DATABASE" -e "SELECT 1"' >/dev/null 2>&1; do \
+		attempts=$$((attempts + 1)); \
+		if [ "$$attempts" -ge 60 ]; then \
+			echo "MySQL did not become ready within 120 seconds. Check: $(DOCKER) logs $(DB_CONTAINER_NAME)" >&2; \
+			exit 1; \
+		fi; \
+		sleep 2; \
+	done
 
 db-down:
 	@$(DOCKER) rm -f $(DB_CONTAINER_NAME) >/dev/null 2>&1 || true

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = {BookController.class, UserController.class, AuthController.class})
+@RestControllerAdvice(assignableTypes = {BookController.class, ReadingController.class, UserController.class, AuthController.class})
 public class ApiErrorHandler {
     @ExceptionHandler(ResponseStatusException.class)
     ResponseEntity<?> status(ResponseStatusException error) {

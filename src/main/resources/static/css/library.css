@@ -25,25 +25,33 @@ body {
 .page-home .eyebrow { color: #867043; letter-spacing: 2.5px; font-size: 10px; }
 .reading-room-art { padding: 0 28px; text-align: center; }
 .room-arch {
+    overflow: hidden;
     height: 230px; max-width: 390px; margin: auto; padding: 54px 35px 0;
     border: 1px solid #d7cbb7; border-bottom: 0; border-radius: 180px 180px 0 0;
     background: radial-gradient(ellipse at top, #ebe1cd, #ddd1b9);
     box-shadow: inset 0 0 30px #8c704511;
 }
-.room-books { display: flex; align-items: flex-end; justify-content: center; gap: 5px; height: 157px; }
-.room-books i {
-    display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl;
-    padding: 14px 8px; width: 37px; height: 145px; border-radius: 3px 5px 1px 1px;
-    font: normal 10px Georgia, serif; letter-spacing: 2px; color: #e8d7ac;
-    background: linear-gradient(90deg, #ffffff15, transparent 18%, #0000001f 80%, #ffffff12), #45513c;
-    border-top: 5px double #bbaa765c; border-bottom: 6px double #bbaa765c;
-    box-shadow: 3px 1px 4px #31231f40;
+/* Leather-bound volumes land bottom first, in a stable, slightly uneven pile. */
+.book-stack { position: relative; height: 157px; width: 100%; }
+.stack-book {
+    position: absolute; bottom: 0; left: 4%; width: 92%; height: 34px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 18px; border-radius: 4px 7px 7px 3px;
+    background: linear-gradient(180deg, #ffffff18, transparent 28%, #00000020), #45513c;
+    border-block: 3px solid #bbaa7660; color: #f5e6bf;
+    box-shadow: 2px 4px 5px #31231f35, inset 6px 0 #00000020;
+    font: normal 11px Georgia, serif; letter-spacing: 1.6px;
+    transform-origin: 35% 100%;
 }
-.room-books i:nth-child(2) { height: 160px; width: 44px; background-color: #774a38; }
-.room-books i:nth-child(3) { height: 132px; background-color: #a08450; color: #fff2cf; }
-.room-books i:nth-child(4) { height: 148px; background-color: #3d5255; }
-.room-books i:nth-child(5) { height: 156px; width: 43px; background-color: #63503d; }
-.room-books i:nth-child(6) { height: 141px; transform: rotate(9deg); transform-origin: bottom; background-color: #6b724e; }
+.stack-book span { font-size: 8px; opacity: .7; margin-left: 8px; }
+.stack-book:nth-child(2) { bottom: 34px; left: 0; width: 88%; height: 29px; background-color: #774a38; }
+.stack-book:nth-child(3) { bottom: 63px; left: 8%; width: 88%; height: 35px; background-color: #947344; }
+.stack-book:nth-child(4) { bottom: 98px; left: 3%; width: 81%; height: 27px; background-color: #3d5255; }
+.stack-book:nth-child(5) { bottom: 125px; left: 7%; width: 86%; height: 30px; background-color: #63503d; }
+.room-art-footer { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 18px; }
+.room-art-footer .room-caption { margin: 0; font: italic 13px Georgia, serif; letter-spacing: 0; color: #66573f; }
+.stack-replay { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px; border: 0; background: transparent; color: var(--green); font-size: 11px; }
+.stack-replay[aria-disabled="true"] { opacity: .5; cursor: default; }
 .room-shelf { height: 15px; margin: 0 -48px; background: linear-gradient(#ab8256 0 22%, #795337 24% 75%, #62402b); box-shadow: 0 9px 9px #3b2d2529; border-radius: 2px; }
 .room-caption { display: block; margin-top: 22px; font-size: 8px; letter-spacing: 2px; color: #887653; }
 .page-home .controls-area { padding: 22px 0; border-top-color: #d8cbb6; }
@@ -92,7 +100,7 @@ body {
 .page-home .book-card .book-cover {
     height: 210px; max-width: 100%; width: auto; object-fit: contain;
     border-radius: 2px 4px 2px 1px; box-shadow: 5px 3px 9px #08060480, -2px 0 1px #fff5d529;
-    transform-origin: left bottom; transition: transform .22s ease, filter .22s ease;
+    transform-origin: left bottom; transition: transform 220ms var(--ease-out);
 }
 .page-home .book-card .cover-fallback {
     width: 151px; height: 210px; flex-shrink: 1; border-radius: 2px 5px 2px 1px;
@@ -100,7 +108,7 @@ body {
     color: #e8d6a6; position: relative;
     background: linear-gradient(90deg, #00000028, transparent 12%, #ffffff0c 90%, #00000012), #435239;
     box-shadow: 5px 3px 9px #08060480, inset 1px 0 #ffffff20;
-    font: 19px/1.35 Georgia, serif; transform-origin: left bottom; transition: transform .22s ease;
+    font: 19px/1.35 Georgia, serif; transform-origin: left bottom; transition: transform 220ms var(--ease-out);
 }
 .page-home .book-card .cover-fallback::after {
     content: ''; position: absolute; inset: 10px 7px; border: 1px solid #dbbe7b55;
@@ -114,8 +122,10 @@ body {
 .page-home .book-card .cover-fallback small { font-size: 8px; letter-spacing: 1.6px; }
 .page-home .book-card .cover-fallback > span { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
 .page-home .book-card:hover .book-cover { transform: none; }
-.page-home .book-cover-button:hover .book-cover, .page-home .book-cover-button:focus-visible .book-cover,
-.page-home .book-cover-button:hover .cover-fallback, .page-home .book-cover-button:focus-visible .cover-fallback { transform: translateY(-7px) rotateY(-8deg); filter: brightness(1.08); }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .page-home .book-cover-button:hover .book-cover,
+    .page-home .book-cover-button:hover .cover-fallback { transform: translateY(-7px) rotateY(-8deg); }
+}
 .page-home .book-card .book-cover.pending-cover { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .page-home .book-info { padding: 32px 2px 14px; text-align: center; }
 .page-home .book-title { color: #f1e5ce; font: 18px/1.4 Georgia, serif; margin-bottom: 5px; }
@@ -139,8 +149,6 @@ body {
     .page-home .results-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-inline: 24px; }
     .reading-room-art { padding-inline: 15px; }
     .room-arch { padding-inline: 24px; }
-    .room-books { gap: 3px; }
-    .room-books i { width: 30px; padding-inline: 5px; }
     .room-shelf { margin-inline: -30px; }
 }
 @media (max-width: 620px) {
@@ -150,7 +158,9 @@ body {
     .page-home .discovery-hero { grid-template-columns: 1fr; padding: 30px 6px 20px; }
     .page-home .discovery-hero h1 { font-size: 43px; }
     .page-home .discovery-hero p:not(.eyebrow) { font-size: 14px; }
-    .reading-room-art { display: none; }
+    .reading-room-art { display: block; padding: 0 22px; }
+    .reading-room-art .room-arch { max-width: 310px; height: 230px; padding-top: 54px; }
+    .room-art-footer { margin-top: 8px; }
     .page-home .categories { justify-content: flex-start; gap: 4px; }
     .page-home .cat-btn { padding: 8px 12px; font-size: 12px; }
     .page-home .cat-btn.special { margin-left: 0; }
@@ -173,4 +183,25 @@ body {
     .page-home .book-card .book-cover, .page-home .book-card .cover-fallback { height: 155px; }
     .page-home .book-card::after { top: 165px; }
     .page-home .book-card .cover-fallback { font-size: 14px; }
+}
+
+/* Find a book on your own shelves and open an available reading edition. */
+.shelf-controls { align-items: end; gap: 14px; flex-wrap: wrap; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.shelf-field { display: flex; flex-direction: column; gap: 6px; min-width: 150px; flex: 1; }
+.shelf-search-field { flex: 2; min-width: 220px; }
+.shelf-controls .shelf-field select { width: 100%; min-width: 0; }
+.shelf-controls > button { min-height: 48px; }
+.page-home .reading-action { margin-bottom: 8px; color: #f1dbad; border-color: #a88c60; background: #ad8b4820; }
+.reading-options { margin: 24px 0; padding: 20px 0; border-block: 1px solid var(--line); }
+.reading-options h3 { font: 24px Georgia, serif; }
+.reading-options p { font-size: 13px; }
+.reading-options .btn { margin: 8px 8px 0 0; max-width: 100%; text-align: center; }
+.reading-edition-note { display: block; color: var(--muted); margin: 6px 0 12px; }
+@media (max-width: 620px) {
+    .shelf-search-field { flex-basis: 100%; min-width: 0; }
+    .shelf-field { min-width: 0; flex-basis: calc(50% - 14px); }
+    .shelf-controls { padding: 14px; }
+    .shelf-controls label { font-size: 11px; }
+    .shelf-controls select { font-size: 12px; padding-inline: 8px; }
+    .shelf-controls > button { width: 100%; }
 }
