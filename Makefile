@@ -1,63 +1,77 @@
-MVN ?= ./mvnw
-SKIP_TESTS ?= false
 DOCKER ?= docker
-IMAGE_NAME ?= booklibrary
-IMAGE_TAG ?= java25
-CONTAINER_NAME ?= booklibrary
-DB_CONTAINER_NAME ?= PageTurner-mysql
-HOST_PORT ?= 8080
-CONTAINER_PORT ?= 8080
+COMPOSE ?= $(DOCKER) compose
+SERVICE ?= backend
+SKIP_TESTS ?= false
+.DEFAULT_GOAL := help
+.PHONY: help init all run up stop down restart re build build-image pull logs ps config shell db-up db-down db-shell test test-backend test-frontend install update clean
 
-WATCH ?= pom.xml src mvnw
-RERUN_POLL_INTERVAL ?= 1
-.PHONY: all clean install update run build-image db-up db-down down re
+help:
+	@printf '%s\n' 'make init          Prepare .env with generated secrets (requires openssl)' 'make run / up      Build and start all services; wait for health checks' 'make down          Remove containers and network; retain database' 'make stop/restart  Stop or restart services' 'make build         Build application images' 'make logs          Follow logs (SERVICE=backend by default)' 'make ps            Show service status' 'make shell         Open a shell (SERVICE=backend by default)' 'make db-shell      Open the MySQL client' 'make test          Run Java and JavaScript tests in containers' 'make install       Package backend in a Maven container' 'make update        Refresh base images/dependencies and rebuild' 'make clean         Stop stack and clean Maven output; retain data' 'make re            Clean, rebuild, and start' 'make config        Validate Compose configuration' 'make frontend-dev  Start Next.js hot reload (requires local Node 22+)'
 
-all: install run
+init:
+	@sh scripts/init.sh
 
-db-up:
-	@set -e; \
-	running="$$($(DOCKER) ps -q -f 'name=^/$(DB_CONTAINER_NAME)$$')"; \
-	if [ -z "$$running" ]; then \
-		echo "Starting MySQL container..."; \
-		$(DOCKER) start $(DB_CONTAINER_NAME) 2>/dev/null || $(DOCKER) run --name $(DB_CONTAINER_NAME) -e MYSQL_ROOT_PASSWORD=super_secret_root -e MYSQL_DATABASE=PageTurner_db -e MYSQL_USER=student -e MYSQL_PASSWORD=student -p 3307:3306 -d mysql:8.0; \
-	fi; \
-	echo "Waiting for MySQL to be ready..."; \
-	attempts=0; \
-	until $(DOCKER) exec $(DB_CONTAINER_NAME) sh -c 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql --protocol=TCP -h 127.0.0.1 -u "$$MYSQL_USER" "$$MYSQL_DATABASE" -e "SELECT 1"' >/dev/null 2>&1; do \
-		attempts=$$((attempts + 1)); \
-		if [ "$$attempts" -ge 60 ]; then \
-			echo "MySQL did not become ready within 120 seconds. Check: $(DOCKER) logs $(DB_CONTAINER_NAME)" >&2; \
-			exit 1; \
-		fi; \
-		sleep 2; \
-	done
+all run up: init
+	$(COMPOSE) up -d --build --wait
+
+build build-image: init
+	$(COMPOSE) build
+
+stop:
+	$(COMPOSE) stop
+
+down:
+	$(COMPOSE) down --remove-orphans
+
+restart:
+	$(COMPOSE) restart
+
+re: clean
+	$(MAKE) run
+
+pull: init
+	$(COMPOSE) pull --ignore-buildable
+
+logs:
+	$(COMPOSE) logs -f $(SERVICE)
+
+ps:
+	$(COMPOSE) ps
+
+config: init
+	$(COMPOSE) config --quiet
+
+shell:
+	$(COMPOSE) exec $(SERVICE) sh
+
+db-up: init
+	$(COMPOSE) up -d --wait db
 
 db-down:
-	@$(DOCKER) rm -f $(DB_CONTAINER_NAME) >/dev/null 2>&1 || true
+	$(COMPOSE) stop db
 
-down: db-down
-	@$(DOCKER) rm -f $(CONTAINER_NAME) >/dev/null 2>&1 || true
+db-shell:
+	$(COMPOSE) exec db sh -c 'MYSQL_PWD="$$MYSQL_PASSWORD" exec mysql -u "$$MYSQL_USER" "$$MYSQL_DATABASE"'
+
+test: test-backend test-frontend
+
+test-backend: init
+	$(COMPOSE) run --rm --no-deps backend-tools verify
+
+test-frontend: init
+	$(COMPOSE) run --rm --no-deps frontend-tools 'npm ci && npm test && npm run build'
+
+install: init
+	$(COMPOSE) run --rm --no-deps backend-tools install -DskipTests=$(SKIP_TESTS)
+
+update: init
+	$(COMPOSE) pull --ignore-buildable
+	$(COMPOSE) run --rm --no-deps backend-tools -U dependency:resolve
+	$(COMPOSE) build --pull
 
 clean: down
-	@$(MVN) clean
+	$(COMPOSE) run --rm --no-deps backend-tools clean
 
-re: clean all
-
-install: clean
-	@$(MVN) install -DskipTests=$(SKIP_TESTS)
-
-update:
-	@git pull --ff-only || true
-	@$(MVN) -U dependency:resolve
-	@$(MVN) install -DskipTests=$(SKIP_TESTS)
-
-build-image:
-	@$(DOCKER) buildx build --platform=linux/amd64 -t $(IMAGE_NAME):$(IMAGE_TAG) --load .
-
-run: db-up build-image
-	@ENV_FILE_FLAG=""; \
-	if [ -f .env ]; then \
-	  ENV_FILE_FLAG="--env-file .env"; \
-	fi; \
-	$(DOCKER) rm -f $(CONTAINER_NAME) >/dev/null 2>&1 || true; \
-	$(DOCKER) run --rm --name $(CONTAINER_NAME) --network host $$ENV_FILE_FLAG -e SERVER_PORT=$(CONTAINER_PORT) $(IMAGE_NAME):$(IMAGE_TAG)
+.PHONY: frontend-dev
+frontend-dev: init
+	cd frontend && npm ci && API_ORIGIN=http://localhost:$${HOST_PORT:-8080} npm run dev

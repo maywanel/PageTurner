@@ -1,0 +1,373 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-12T00:56:22.284058+00:00",
+  "title": "Design System: PageTurner",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0124 91.52)",
+          "oklch(26% 0.0124 91.52)",
+          "oklch(38% 0.0124 91.52)",
+          "oklch(49% 0.0124 91.52)",
+          "oklch(61% 0.0124 91.52)",
+          "oklch(72% 0.0124 91.52)",
+          "oklch(84% 0.0124 91.52)",
+          "oklch(95% 0.0124 91.52)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0178 112.20)",
+          "oklch(26% 0.0178 112.20)",
+          "oklch(38% 0.0178 112.20)",
+          "oklch(49% 0.0178 112.20)",
+          "oklch(61% 0.0178 112.20)",
+          "oklch(72% 0.0178 112.20)",
+          "oklch(84% 0.0178 112.20)",
+          "oklch(95% 0.0178 112.20)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0171 98.52)",
+          "oklch(26% 0.0171 98.52)",
+          "oklch(38% 0.0171 98.52)",
+          "oklch(49% 0.0171 98.52)",
+          "oklch(61% 0.0171 98.52)",
+          "oklch(72% 0.0171 98.52)",
+          "oklch(84% 0.0171 98.52)",
+          "oklch(95% 0.0171 98.52)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "tonalRamp": [
+          "oklch(15% 0.0152 94.21)",
+          "oklch(26% 0.0152 94.21)",
+          "oklch(38% 0.0152 94.21)",
+          "oklch(49% 0.0152 94.21)",
+          "oklch(61% 0.0152 94.21)",
+          "oklch(72% 0.0152 94.21)",
+          "oklch(84% 0.0152 94.21)",
+          "oklch(95% 0.0152 94.21)"
+        ]
+      },
+      "action": {
+        "role": "primary",
+        "displayName": "Action",
+        "tonalRamp": [
+          "oklch(15% 0.0190 111.73)",
+          "oklch(26% 0.0190 111.73)",
+          "oklch(38% 0.0190 111.73)",
+          "oklch(49% 0.0190 111.73)",
+          "oklch(61% 0.0190 111.73)",
+          "oklch(72% 0.0190 111.73)",
+          "oklch(84% 0.0190 111.73)",
+          "oklch(95% 0.0190 111.73)"
+        ]
+      },
+      "action-hover": {
+        "role": "primary",
+        "displayName": "Action Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0318 110.09)",
+          "oklch(26% 0.0318 110.09)",
+          "oklch(38% 0.0318 110.09)",
+          "oklch(49% 0.0318 110.09)",
+          "oklch(61% 0.0318 110.09)",
+          "oklch(72% 0.0318 110.09)",
+          "oklch(84% 0.0318 110.09)",
+          "oklch(95% 0.0318 110.09)"
+        ]
+      },
+      "action-text": {
+        "role": "primary",
+        "displayName": "Action Text",
+        "tonalRamp": [
+          "oklch(15% 0.0142 84.58)",
+          "oklch(26% 0.0142 84.58)",
+          "oklch(38% 0.0142 84.58)",
+          "oklch(49% 0.0142 84.58)",
+          "oklch(61% 0.0142 84.58)",
+          "oklch(72% 0.0142 84.58)",
+          "oklch(84% 0.0142 84.58)",
+          "oklch(95% 0.0142 84.58)"
+        ]
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "Field",
+        "tonalRamp": [
+          "oklch(15% 0.0095 93.57)",
+          "oklch(26% 0.0095 93.57)",
+          "oklch(38% 0.0095 93.57)",
+          "oklch(49% 0.0095 93.57)",
+          "oklch(61% 0.0095 93.57)",
+          "oklch(72% 0.0095 93.57)",
+          "oklch(84% 0.0095 93.57)",
+          "oklch(95% 0.0095 93.57)"
+        ]
+      },
+      "focus": {
+        "role": "neutral",
+        "displayName": "Focus",
+        "tonalRamp": [
+          "oklch(15% 0.0930 299.64)",
+          "oklch(26% 0.0930 299.64)",
+          "oklch(38% 0.0930 299.64)",
+          "oklch(49% 0.0930 299.64)",
+          "oklch(61% 0.0930 299.64)",
+          "oklch(72% 0.0930 299.64)",
+          "oklch(84% 0.0930 299.64)",
+          "oklch(95% 0.0930 299.64)"
+        ]
+      },
+      "fiction": {
+        "role": "secondary",
+        "displayName": "Fiction",
+        "tonalRamp": [
+          "oklch(15% 0.0947 298.39)",
+          "oklch(26% 0.0947 298.39)",
+          "oklch(38% 0.0947 298.39)",
+          "oklch(49% 0.0947 298.39)",
+          "oklch(61% 0.0947 298.39)",
+          "oklch(72% 0.0947 298.39)",
+          "oklch(84% 0.0947 298.39)",
+          "oklch(95% 0.0947 298.39)"
+        ]
+      },
+      "science": {
+        "role": "secondary",
+        "displayName": "Science",
+        "tonalRamp": [
+          "oklch(15% 0.0528 159.21)",
+          "oklch(26% 0.0528 159.21)",
+          "oklch(38% 0.0528 159.21)",
+          "oklch(49% 0.0528 159.21)",
+          "oklch(61% 0.0528 159.21)",
+          "oklch(72% 0.0528 159.21)",
+          "oklch(84% 0.0528 159.21)",
+          "oklch(95% 0.0528 159.21)"
+        ]
+      },
+      "philosophy": {
+        "role": "secondary",
+        "displayName": "Philosophy",
+        "tonalRamp": [
+          "oklch(15% 0.0759 73.73)",
+          "oklch(26% 0.0759 73.73)",
+          "oklch(38% 0.0759 73.73)",
+          "oklch(49% 0.0759 73.73)",
+          "oklch(61% 0.0759 73.73)",
+          "oklch(72% 0.0759 73.73)",
+          "oklch(84% 0.0759 73.73)",
+          "oklch(95% 0.0759 73.73)"
+        ]
+      },
+      "history": {
+        "role": "secondary",
+        "displayName": "History",
+        "tonalRamp": [
+          "oklch(15% 0.0861 10.71)",
+          "oklch(26% 0.0861 10.71)",
+          "oklch(38% 0.0861 10.71)",
+          "oklch(49% 0.0861 10.71)",
+          "oklch(61% 0.0861 10.71)",
+          "oklch(72% 0.0861 10.71)",
+          "oklch(84% 0.0861 10.71)",
+          "oklch(95% 0.0861 10.71)"
+        ]
+      },
+      "art": {
+        "role": "secondary",
+        "displayName": "Art",
+        "tonalRamp": [
+          "oklch(15% 0.0472 223.63)",
+          "oklch(26% 0.0472 223.63)",
+          "oklch(38% 0.0472 223.63)",
+          "oklch(49% 0.0472 223.63)",
+          "oklch(61% 0.0472 223.63)",
+          "oklch(72% 0.0472 223.63)",
+          "oklch(84% 0.0472 223.63)",
+          "oklch(95% 0.0472 223.63)"
+        ]
+      },
+      "poetry": {
+        "role": "secondary",
+        "displayName": "Poetry",
+        "tonalRamp": [
+          "oklch(15% 0.0762 339.83)",
+          "oklch(26% 0.0762 339.83)",
+          "oklch(38% 0.0762 339.83)",
+          "oklch(49% 0.0762 339.83)",
+          "oklch(61% 0.0762 339.83)",
+          "oklch(72% 0.0762 339.83)",
+          "oklch(84% 0.0762 339.83)",
+          "oklch(95% 0.0762 339.83)"
+        ]
+      },
+      "technology": {
+        "role": "secondary",
+        "displayName": "Technology",
+        "tonalRamp": [
+          "oklch(15% 0.0395 249.94)",
+          "oklch(26% 0.0395 249.94)",
+          "oklch(38% 0.0395 249.94)",
+          "oklch(49% 0.0395 249.94)",
+          "oklch(61% 0.0395 249.94)",
+          "oklch(72% 0.0395 249.94)",
+          "oklch(84% 0.0395 249.94)",
+          "oklch(95% 0.0395 249.94)"
+        ]
+      },
+      "nature": {
+        "role": "secondary",
+        "displayName": "Nature",
+        "tonalRamp": [
+          "oklch(15% 0.0749 114.12)",
+          "oklch(26% 0.0749 114.12)",
+          "oklch(38% 0.0749 114.12)",
+          "oklch(49% 0.0749 114.12)",
+          "oklch(61% 0.0749 114.12)",
+          "oklch(72% 0.0749 114.12)",
+          "oklch(84% 0.0749 114.12)",
+          "oklch(95% 0.0749 114.12)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Literary display",
+        "purpose": "Page headings."
+      },
+      "book-prose": {
+        "displayName": "Book prose",
+        "purpose": "Descriptions in the open-book dialog."
+      }
+    },
+    "shadows": [
+      {
+        "name": "window",
+        "value": "0 22px 70px #08131b40, 0 2px 5px #18272c20",
+        "purpose": "Ambient lift for the paper window."
+      },
+      {
+        "name": "shelf",
+        "value": "0 6px 9px -6px #60554265",
+        "purpose": "A narrow shadow below the wooden ledge."
+      },
+      {
+        "name": "dialog",
+        "value": "0 25px 90px #28221655",
+        "purpose": "Foreground book detail."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control",
+        "value": "0.18s ease",
+        "purpose": "Button background, color and shadow."
+      },
+      {
+        "name": "spine-lift",
+        "value": "0.3s cubic-bezier(0.2, 0.7, 0.2, 1)",
+        "purpose": "Lift a spine by 14px and tilt -2 degrees."
+      },
+      {
+        "name": "book-open",
+        "value": "0.32s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Dialog entry; disabled under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-desktop",
+        "value": "1050px"
+      },
+      {
+        "name": "mobile",
+        "value": "700px"
+      },
+      {
+        "name": "wide",
+        "value": "1500px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "description": "The main save or form submission action.",
+      "html": "<button class=\"ds-primary\">Save book</button>",
+      "css": ".ds-primary{font-family:var(--sans,\"DM Sans Variable\",sans-serif);font-size:12px;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s;background:#303126;color:#fffaf0;border:1px solid #303126;border-radius:5px;padding:12px 20px;line-height:1.4}.ds-primary:hover{background:#4c4d39}.ds-primary:focus-visible{outline:2px solid #75609b;outline-offset:4px}",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "description": "A quieter companion action.",
+      "html": "<button class=\"ds-secondary\">Cancel</button>",
+      "css": ".ds-secondary{font-family:var(--sans,\"DM Sans Variable\",sans-serif);font-size:12px;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s;background:transparent;color:var(--ink,#28291f);border:1px solid #cfcabb;border-radius:5px;padding:12px 20px;line-height:1.4}.ds-secondary:hover{background:#eae5d9}.ds-secondary:focus-visible{outline:2px solid #75609b;outline-offset:4px}",
+      "refersTo": "button-secondary"
+    },
+    {
+      "name": "Labeled field",
+      "kind": "input",
+      "description": "A persistent label with a warm paper input.",
+      "html": "<label class=\"ds-label\">Book title<input class=\"ds-field\" placeholder=\"Enter a title\"></label>",
+      "css": ".ds-label{font:12px var(--sans,\"DM Sans Variable\",sans-serif);color:var(--ink,#28291f)}.ds-field{display:block;padding:11px 12px;margin-top:8px;background:#fbf9f2;border:1px solid #d9d5c8;border-radius:5px;font:14px var(--sans,\"DM Sans Variable\",sans-serif);color:var(--ink,#28291f)}.ds-field:focus-visible{outline:2px solid #75609b;outline-offset:4px}",
+      "refersTo": "input"
+    },
+    {
+      "name": "View navigation",
+      "kind": "nav",
+      "description": "The three collection presentations share one compact switch.",
+      "html": "<nav class=\"ds-views\" aria-label=\"View\"><button aria-pressed=\"true\">Shelf</button><button aria-pressed=\"false\">Covers</button><button aria-pressed=\"false\">Topics</button></nav>",
+      "css": ".ds-views{display:inline-flex;gap:2px;border-radius:24px;padding:3px;background:#eae7df}.ds-views button{font-family:var(--sans,\"DM Sans Variable\",sans-serif);font-size:12px;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s;border:0;padding:6px 13px;color:#6a695f;border-radius:20px;background:transparent}.ds-views button[aria-pressed=\"true\"]{background:#fffdf7;color:var(--ink,#28291f);box-shadow:0 2px 4px #342f2512}.ds-views button:hover{background:#fffdf7}.ds-views button:focus-visible{outline:2px solid #75609b;outline-offset:4px}"
+    },
+    {
+      "name": "Selected filter",
+      "kind": "chip",
+      "description": "Selected topic or reading-status filter.",
+      "html": "<button class=\"ds-chip\" aria-pressed=\"true\">Fiction</button>",
+      "css": ".ds-chip{font-family:var(--sans,\"DM Sans Variable\",sans-serif);font-size:12px;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s;background:var(--ink,#28291f);color:#fffaf0;border:1px solid var(--ink,#28291f);border-radius:20px;padding:5px 10px;font-size:11px}.ds-chip:hover{background:#4c4d39}.ds-chip:focus-visible{outline:2px solid #75609b;outline-offset:4px}",
+      "refersTo": "chip-selected"
+    },
+    {
+      "name": "Cover card",
+      "kind": "card",
+      "description": "Provider cover or cloth fallback, with title underneath.",
+      "html": "<button class=\"ds-card\"><span class=\"ds-cover\"><span>THE PAGETURNER LIBRARY</span><strong>Walden</strong><i>Henry David Thoreau</i></span><strong>Walden</strong></button>",
+      "css": ".ds-card{font-family:var(--sans,\"DM Sans Variable\",sans-serif);font-size:12px;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s;background:none;border:0;text-align:left;width:160px;color:var(--ink,#28291f)}.ds-cover{display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:2/3;padding:15px;background:#416551;color:#eee8d0;box-shadow:3px 5px 10px #3e392d25,inset 2px 0 3px #0004;border-radius:2px 4px 4px 2px;transition:transform .25s ease,box-shadow .25s}.ds-cover span{font-size:6px;letter-spacing:.16em}.ds-cover strong{font:500 27px var(--serif,\"Cormorant Garamond Variable\",Georgia,serif)}.ds-cover i{font:italic 12px var(--serif,Georgia,serif)}.ds-card>strong{display:block;margin-top:15px;font:600 20px var(--serif,Georgia,serif)}.ds-card:hover .ds-cover{transform:translateY(-6px) rotate(-1deg);box-shadow:4px 10px 14px #3e392d33}.ds-card:focus-visible{outline:2px solid #75609b;outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-cover{transition:none}.ds-card:hover .ds-cover{transform:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The reading room",
+    "overview": "A warm paper window sits against an ambient olive-to-blue backdrop. Book objects carry the texture and color; generous serif headings and quiet controls make browsing feel like spending time with a physical collection. This describes the implemented interpretation of the supplied video, rather than a separately researched brand position.",
+    "keyCharacteristics": [
+      "Warm paper and dark olive ink.",
+      "Cloth bindings, wooden shelves, and an open-book detail view.",
+      "Literary serif display type paired with compact sans-serif controls."
+    ],
+    "rules": [],
+    "dos": [
+      "Do keep book texture and physical depth concentrated in books, shelves, and the open-book dialog.",
+      "Do preserve visible focus, readable mobile inputs, reduced motion, and real loading and error states.",
+      "Do reuse the serif/sans role split and the established warm neutral surfaces."
+    ],
+    "donts": [
+      "Don't represent decorative authentication books as a user's saved collection.",
+      "Don't use binding color as a substitute for explicit reading-status labels.",
+      "Don't make the desktop shelf composition force horizontal page overflow on mobile."
+    ]
+  }
+}

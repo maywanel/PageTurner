@@ -4,7 +4,7 @@ import com.example.PageTurner.controller.UserController;
 import com.example.PageTurner.model.User;
 import com.example.PageTurner.repository.UserRepository;
 import com.example.PageTurner.service.AdminInterceptor;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpSession;

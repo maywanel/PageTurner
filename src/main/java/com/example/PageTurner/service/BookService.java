@@ -19,7 +19,11 @@ public class BookService {
 
     public BookService(BookRepository books, WebClient.Builder builder) {
         this.books = books;
-        this.webClient = builder.baseUrl("https://openlibrary.org").build();
+        // Popular subjects include large ISBN lists across many editions.
+        // Keep a bounded response limit without changing other API clients.
+        this.webClient = builder.clone().baseUrl("https://openlibrary.org")
+            .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
+            .build();
     }
 
     public List<Book> getAllBooks(int ownerId) { return books.findAllByOwnerIdOrderByIdDesc(ownerId); }

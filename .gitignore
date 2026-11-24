@@ -33,3 +33,12 @@ build/
 .vscode/
 
 .env
+**/.env
+**/.env.*
+!.env.example
+
+node_modules/
+.next/
+*.tsbuildinfo
+test-results/
+playwright-report/

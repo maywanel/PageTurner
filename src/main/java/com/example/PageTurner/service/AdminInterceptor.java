@@ -17,8 +17,7 @@ public class AdminInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                              @NonNull Object handler) throws Exception {
-        String path = request.getRequestURI().substring(request.getContextPath().length());
-        if (path.length() > 1 && path.endsWith("/")) path = path.substring(0, path.length() - 1);
+        String path = (String) request.getAttribute(org.springframework.web.servlet.HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         boolean publicPost = "POST".equals(request.getMethod()) &&
             (path.equals("/users") || path.equals("/users/login") || path.equals("/users/logout"));
         if (publicPost) return true;
@@ -32,7 +31,7 @@ public class AdminInterceptor implements HandlerInterceptor {
             return false;
         }
         response.setHeader("Cache-Control", "no-store");
-        boolean personal = path.equals("/users/me") || path.matches("/users/\\d+/password");
+        boolean personal = path.equals("/users/me") || path.equals("/users/{id}/password");
         boolean administrative = path.startsWith("/admin") || path.equals("/systeminfo")
             || path.startsWith("/api/system") || (path.startsWith("/users") && !personal);
         if (administrative && !SessionUserService.isAdmin(user)) {

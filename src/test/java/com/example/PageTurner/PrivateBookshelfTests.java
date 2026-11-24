@@ -4,12 +4,12 @@ import com.example.PageTurner.model.Book;
 import com.example.PageTurner.model.User;
 import com.example.PageTurner.repository.BookRepository;
 import com.example.PageTurner.repository.UserRepository;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,6 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class PrivateBookshelfTests {
     @Autowired MockMvc mvc;
+    @Autowired org.springframework.security.crypto.password.PasswordEncoder encoder;
+    @org.springframework.test.context.bean.override.mockito.MockitoBean
+    org.springframework.data.redis.core.StringRedisTemplate redis;
     @Autowired UserRepository users;
     @Autowired BookRepository books;
     @Autowired ObjectMapper mapper;
@@ -113,13 +116,47 @@ class PrivateBookshelfTests {
     void expiredSessionAndCsrfAreEnforced() throws Exception {
         mvc.perform(get("/books")).andExpect(status().isUnauthorized()).andExpect(header().string("X-Session-Expired", "true"));
         mvc.perform(get("/users/me")).andExpect(status().isUnauthorized());
-        mvc.perform(get("/home")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login?expired=1"));
+        mvc.perform(get("/home")).andExpect(status().isNotFound());
+        mvc.perform(get("/css/app.css")).andExpect(status().isNotFound());
+        mvc.perform(get("/api/page-access")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/page-access").session(aliceSession)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/page-access?admin=true").session(aliceSession)).andExpect(status().isForbidden());
         mvc.perform(post("/books").session(aliceSession).contentType("application/json").content(BOOK)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void bearerIdentitySurvivesEmailChangesAndEndsAtAccountDeletion() throws Exception {
+        alice.setPassword(encoder.encode("test-password"));
+        users.save(alice);
+        org.mockito.Mockito.doReturn(1L).when(redis).execute(org.mockito.ArgumentMatchers.any(org.springframework.data.redis.core.script.RedisScript.class),
+            org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any(Object[].class));
+        var login = mvc.perform(csrf(post("/login"), new MockHttpSession())
+                .content("{\"email\":\"alice@example.com\",\"password\":\"test-password\"}"))
+            .andExpect(status().isOk()).andReturn();
+        String token = mapper.readTree(login.getResponse().getContentAsString()).get("token").asText();
+        String email = alice.getEmail();
+        alice.setEmail("renamed@example.com"); users.save(alice);
+        bob.setEmail(email); users.save(bob);
+        mvc.perform(get("/users/me").header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(alice.getId()));
+        users.delete(alice);
+        mvc.perform(get("/users/me").header("Authorization", "Bearer " + token))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void loginFailsClosedWhenRedisIsUnavailable() throws Exception {
+        org.mockito.Mockito.when(redis.execute(org.mockito.ArgumentMatchers.any(org.springframework.data.redis.core.script.RedisScript.class),
+            org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any(Object[].class)))
+            .thenThrow(new IllegalStateException("unavailable"));
+        mvc.perform(post("/login")).andExpect(status().isServiceUnavailable());
     }
 
     @Test
     void rolesAndAccountDetailsComeFromDatabase() throws Exception {
         aliceSession.setAttribute("isAdmin", true);
+        mvc.perform(get("/users").session(aliceSession)).andExpect(status().isForbidden());
+        alice.setRole(User.Role.TENANT_ADMIN); users.save(alice);
         mvc.perform(get("/users").session(aliceSession)).andExpect(status().isForbidden());
         alice.setRole(User.Role.SUPER_ADMIN); users.save(alice);
         mvc.perform(get("/users").session(aliceSession)).andExpect(status().isOk());

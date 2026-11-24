@@ -10,6 +10,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import java.util.ArrayList;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import com.sun.net.httpserver.HttpServer;
+import org.springframework.web.reactive.function.client.ClientRequest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
@@ -35,4 +40,31 @@ class BookSearchTests {
         var error = assertThrows(ResponseStatusException.class, () -> new BookService(mock(BookRepository.class), builder).searchBooksFromApi("fantasy", 1));
         assertEquals(HttpStatus.BAD_GATEWAY, error.getStatusCode());
     }
+    @Test
+    void popularSubjectsCanDecodeMoreThanTheDefaultBufferLimit() throws Exception {
+        String isbns = "\"9780141439518\",".repeat(30_000) + "\"9780141439518\"";
+        byte[] payload = ("{\"docs\":[{\"title\":\"Fiction classic\",\"author_name\":[\"Writer\"],"
+            + "\"cover_i\":123,\"isbn\":[" + isbns + "]}]}").getBytes(StandardCharsets.UTF_8);
+        assertTrue(payload.length > 256 * 1024);
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/search.json", exchange -> {
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, payload.length);
+            try (var body = exchange.getResponseBody()) { body.write(payload); }
+        });
+        server.start();
+        try {
+            URI endpoint = URI.create("http://127.0.0.1:" + server.getAddress().getPort() + "/search.json");
+            var builder = WebClient.builder().filter((request, next) ->
+                next.exchange(ClientRequest.from(request).url(endpoint).build()));
+            var result = new BookService(mock(BookRepository.class), builder).searchBooksFromApi("subject:fiction", 1);
+            assertEquals(1, result.size());
+            assertEquals("Fiction classic", result.getFirst().getTitle());
+            assertEquals("9780141439518", result.getFirst().getIsbn());
+            assertEquals(123L, result.getFirst().getCoverId());
+        } finally {
+            server.stop(0);
+        }
+    }
+
 }

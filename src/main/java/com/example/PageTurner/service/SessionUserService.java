@@ -20,7 +20,7 @@ public class SessionUserService {
             user = users.findById(id.intValue()).orElse(null);
             if (user == null) session.invalidate();
         } else if (request.getUserPrincipal() != null) {
-            user = users.findByEmail(request.getUserPrincipal().getName()).orElse(null);
+            user = users.findById(Integer.parseInt(request.getUserPrincipal().getName())).orElse(null);
         }
         if (user != null) request.setAttribute("authenticatedUser", user);
         return user;
@@ -33,6 +33,6 @@ public class SessionUserService {
     }
 
     public static boolean isAdmin(User user) {
-        return user != null && (user.getRole() == User.Role.SUPER_ADMIN || user.getRole() == User.Role.TENANT_ADMIN);
+        return user != null && user.getRole() == User.Role.SUPER_ADMIN;
     }
 }

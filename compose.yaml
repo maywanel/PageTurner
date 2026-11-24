@@ -1,0 +1,131 @@
+name: pageturner
+
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-PageTurner_db}
+      MYSQL_USER: ${DATABASE_USERNAME:?Run make init and set DATABASE_USERNAME}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD:?Run make init and set DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Run make init}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docs/migrations/fresh-schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql --protocol=TCP -h 127.0.0.1 -u "$$MYSQL_USER" "$$MYSQL_DATABASE" -e "SELECT 1"']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    networks:
+      - storage
+
+  backend:
+    build: .
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-PageTurner_db}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?Run make init}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      APP_TRUST_GATEWAY_IP: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q --spider http://127.0.0.1:8080/api/csrf']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+    networks:
+      - PageTurner
+      - storage
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q --spider http://127.0.0.1:3000/health']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - PageTurner
+
+  nginx:
+    build:
+      context: .
+      dockerfile: deploy/nginx/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${HOST_PORT:-8080}:80'
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q --spider http://127.0.0.1/health']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - PageTurner
+
+  backend-tools:
+    profiles: [tools]
+    image: maven:3.9.11-eclipse-temurin-25
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - maven-cache:/root/.m2
+    entrypoint: [mvn, --batch-mode]
+    networks:
+      - PageTurner
+
+  frontend-tools:
+    profiles: [tools]
+    image: node:22-alpine
+    working_dir: /workspace/frontend
+    volumes:
+      - .:/workspace
+      - frontend-node-modules:/workspace/frontend/node_modules
+    entrypoint: [sh, -c]
+    networks:
+      - PageTurner
+  
+  redis:
+    build: redis
+    container_name: redis
+    restart: always
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - storage
+
+volumes:
+  mysql-data:
+  maven-cache:
+  frontend-node-modules:
+
+networks:
+  storage:
+    internal: true
+  PageTurner:
+    driver: bridge

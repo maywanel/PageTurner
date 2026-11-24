@@ -1,150 +1,118 @@
-# Book Library Management System
+# PageTurner
 
-A full-stack Spring Boot web application for managing books, users, and administrative tasks. This project features secure user authentication via JWT, a responsive web interface using Thymeleaf, and integrates with the external OpenLibrary API to fetch book data.
+A Spring Boot API and Next.js 16 / React 19 / Tailwind CSS 4 frontend for book discovery, private bookshelves, and account administration.
 
-## 🚀 Features
+## Run with Docker Compose
 
-- **User Authentication & Security:** Secure login and registration utilizing Spring Security and JSON Web Tokens (JWT).
-- **Role-Based Access Control:** Distinct roles and dashboards for standard Users and Administrators.
-- **OpenLibrary Integration:** Fetches real-time book data and metadata using the OpenLibrary API.
-- **Admin Dashboard:** Dedicated interface for user management and system information monitoring.
-- **Private Bookshelves:** Saved books belong to individual accounts, with Want to read, Reading, and Finished statuses.
-- **Custom UI:** Responsive Thymeleaf pages with a shared PageTurner theme, accessible forms, and interactive book discovery.
+Requirements: Docker Engine with the Compose plugin, Make, and OpenSSL. Java, Maven, and Node are supplied by containers.
 
-## 🛠️ Tech Stack
-
-- **Backend:** Java, Spring Boot (Web, Security, Data JPA)
-- **Security:** Spring Security, JWT (JSON Web Tokens)
-- **Frontend:** HTML5, CSS3, JavaScript, Thymeleaf
-- **Build Tool:** Maven
-- **External APIs:** OpenLibrary API
-
-## 📂 Project Structure
-
-- `src/main/java/com/example/PageTurner/`
-  - `config/` - Application and Security configurations.
-  - `controller/` - REST and Web MVC controllers handling routing.
-  - `dto/` - Data Transfer Objects (Requests/Responses/OpenLibrary mapping).
-  - `filter/` - Custom filters, including `JwtAuthenticationFilter`.
-  - `model/` - Entity classes representing database tables.
-  - `repository/` - Data access interfaces extending Spring Data JPA.
-  - `service/` - Core business logic and JWT utilities.
-- `src/main/resources/`
-  - `templates/` - HTML Thymeleaf views (Home, Login, Admin, User, Error pages).
-  - `static/` - Static assets like custom JS, CSS, and favicons.
-  - `application.properties` - Main configuration file.
-  - `data.sql` - Initial database seeding scripts.
-
----
-
-## ⚙️ Prerequisites
-
-Before you begin, ensure you have the following installed on your machine:
-
-- [Java Development Kit (JDK) 25](https://adoptium.net/) or higher.
-- [Node.js and npm](https://nodejs.org/) (optional, only if using the `package.json` for frontend asset management).
-
----
-
-## 🚀 How to Run the Application
-
-You have multiple options to start this application depending on your workflow.
-
-### Option 1: Using the Makefile
-
-If you have make installed, you can leverage the included Makefile.
-
-```bash
+```sh
+make init
 make run
 ```
 
-(Note: You can inspect the Makefile in the root directory for other helpful commands like `make clean` or `make build`).
+Open **http://localhost:8080** (or the `HOST_PORT` in `.env`). `make run` also runs initialization, builds the images, and waits for healthy services. Initialization generates secrets for new installations and preserves existing values. Configure optional administrator credentials in `.env` before startup.
 
-### Option 2: Using the Maven Wrapper (Cross-platform)
+| Service | Purpose | Port |
+| --- | --- | --- |
+| `nginx` | Public gateway, routing and protected-page authorization | `${HOST_PORT:-8080}` on host |
+| `frontend` | Next.js standalone Node server | Internal 3000 |
+| `backend` | Spring Boot JSON API, sessions and permissions | Internal 8080 |
+| `db` | MySQL 8 with persistent `mysql-data` volume | Internal 3306 |
 
-You don't need to install Maven globally; the project comes with a Maven wrapper (mvnw).
+Only Nginx publishes a host port. `/api`, `/users`, and `/books` requests go to the backend with their original paths. Legacy JSON `POST /login` and `POST /register` also go to the backend; GET requests serve the corresponding pages. Other requests go to the frontend. Protected pages use an Nginx authorization subrequest to `/api/page-access`, preserving login and administrator redirects. All browser requests share one origin, so session cookies and CSRF continue to work without CORS configuration.
 
-On Windows:
+The backend JAR contains no frontend assets or templates and does not serve pages. Existing page URLs (`/login`, `/register`, `/home`, `/settings`, `/admin`, `/admin/users`, `/systeminfo`) are retained.
 
-```cmd
-mvnw.cmd spring-boot:run
+## Commands
+
+Run `make help` for the command list.
+
+```sh
+make run                     # Build/start the stack, wait for health
+make logs SERVICE=nginx       # Follow a service's logs (default: backend)
+make ps                      # Container and health status
+make test                    # Java tests, frontend tests and production build
+make build                   # Build all three application images
+make install                 # Maven install in a container
+make update                  # Pull base images, refresh dependencies, rebuild
+make shell SERVICE=frontend  # Shell inside a running service
+make db-shell                # MySQL client
+make db-up                   # Start only MySQL and wait for readiness
+make db-down                 # Stop MySQL without removing its data
+make stop                    # Stop services
+make restart                 # Restart existing containers
+make down                    # Remove containers/network, preserve volumes
+make clean                   # Stop stack and remove Maven build output
+make re                      # Clean, rebuild and start
+make config                  # Validate Compose without printing secrets
+make frontend-dev            # Next.js hot reload at localhost:3000 (Node 22+)
 ```
 
-On macOS / Linux:
+After changing code or `.env`, use `make run` to rebuild/recreate affected containers; `make restart` does not apply configuration changes. `make update` does not pull Git changes. All normal cleanup commands retain the database and Maven cache. Explicitly running `docker compose down --volumes` deletes that data.
 
-```bash
-./mvnw spring-boot:run
+Compose uses `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `MYSQL_DATABASE`, and `MYSQL_ROOT_PASSWORD` from `.env`. It constructs `DATABASE_URL` with the service hostname `db` and always runs Spring on internal port 8080. Older `.env` values for `DATABASE_URL` and `SERVER_PORT` do not override these internal settings. MySQL initialization variables apply only to an empty volume; changing credentials later requires updating the database users as well.
+
+Existing standalone MySQL containers/data are not migrated automatically. Back up and restore any existing data into the Compose database before switching. The default project name is `pageturner`; set `COMPOSE_PROJECT_NAME` to isolate another stack and choose a different `HOST_PORT`.
+
+## Source layout
+
+- `src/main/java/`: API controllers, security, services, persistence.
+- `src/main/resources/`: Spring configuration and database resources.
+- `frontend/app/`: Next.js App Router pages, global Tailwind/CSS theme, error routes.
+- `frontend/components/`: React library, shelf, book detail, authentication, account and administration UI.
+- `frontend/lib/`: Typed API client, CSRF handling, book filtering, provider URL validation.
+- `frontend/public/`: Favicons and public assets. Fonts are self-hosted through Fontsource.
+- `frontend/e2e/`: Playwright interaction and responsive-layout tests with deterministic API fixtures.
+- `frontend/Dockerfile`: Multi-stage Next.js build and unprivileged standalone Node runtime.
+- `Dockerfile`: Multi-stage Java 25 backend build.
+- `deploy/nginx/`: Public gateway image and reverse proxy configuration.
+- `compose.yaml`: Services, readiness checks, persistent storage and test tools.
+- `scripts/init.sh`: Idempotent environment initialization.
+
+## Frontend development
+
+The visual reference is the supplied `booklibrarydesign.mp4`: warm paper, serif typography, cloth book spines on wooden shelves, and an opening-book detail dialog. Shelf, cover and topic views share real backend data. Sign-in pairs the account form with illustrated classic book jackets. On phones the form comes first.
+
+```sh
+make run                              # Start the API, database and gateway
+make frontend-dev                     # Hot reload at http://localhost:3000
+# Or, with a custom gateway port:
+cd frontend
+npm ci
+API_ORIGIN=http://localhost:8080 npm run dev
+npm test                              # Filtering, sorting and safe reading-link tests
+npm run build                         # TypeScript and production compilation
+npx playwright install chromium       # Once, for browser testing
+npm run test:e2e                       # Starts its own frontend test server
 ```
 
-### Option 3: Build a JAR and Run
+`API_ORIGIN` is server-side development configuration. In production the public Nginx gateway routes requests directly to Spring and Next.js. The frontend container serves on internal port 3000; only Nginx publishes a port. `make run` rebuilds after frontend edits. `make test-frontend` installs locked dependencies, runs unit tests, and compiles the frontend inside Node 22. Browser tests use clearly isolated fixtures; live integration testing should run against a disposable account.
 
-To package the application into a standalone executable JAR file and run it:
-
-```bash
-./mvnw clean package
-java -jar target/PageTurner-0.0.1-SNAPSHOT.jar
-```
-
-## 🌐 Accessing the Application
-
-Once the server successfully starts, you can access the web application in your browser at:
-
-```
-http://localhost:8080
-```
-
-### Default Routes:
-
-- **Home:** `/`
-- **Login:** `/login`
-- **Signup:** `/register`
-- **Admin Dashboard:** `/admin`
-
----
-
-## 💡 Important Notes & Troubleshooting
-
-**JAR File Name:** In the run instructions (Option 4), the `target/PageTurner-0.0.1-SNAPSHOT.jar` filename is used because the default artifact name for a `com.example.PageTurner` package is usually `PageTurner`. If your `pom.xml` specifies a different `<finalName>`, you will need to update the `java -jar` command accordingly.
-
-**Server Port:** Spring Boot runs on port 8080 by default. If your `src/main/resources/application.properties` file overrides this (e.g., `server.port=9090`), make sure to update the URL when accessing the application in your browser.
-
-**Database:** The application connects to the database configured in `.env`. Optional administrator bootstrapping uses environment variables. Ensure your database connection settings in `application.properties` are correctly configured for your local environment (whether using an H2 in-memory database or an external SQL database).
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-### Frontend styling and behavior
-
-All pages share `src/main/resources/static/css/app.css`. Its opening design tokens define the colors, surfaces, and spacing used by discovery, authentication, administration, account settings, and error pages. No frontend build step or external font service is required.
-
-`static/js/library.js` handles book search, genre selection, saved books, loading states, retry feedback, and cover fallbacks. `static/js/ui.js` provides password visibility controls and navigation enhancements. Existing Spring routes and API endpoints are retained.
-
-For frontend development, run the Spring Boot application and visit `/login`, `/register`, or `/home`; the optional static-only npm server does not render Thymeleaf pages.
-
+Backend-only local development can still use `./mvnw spring-boot:run` with an explicitly configured database URL, but it does not serve the UI.
 
 ### Private bookshelves and discovery
 
 - Saved-book list, details, updates, reading-status changes, and deletion are scoped to the authenticated account. Administrators cannot access another account’s bookshelf through the book API.
 - The same title can be saved by different accounts; duplicate titles within one bookshelf return `409`.
-- **New books** fetches the next 24 results for the current search or genre. **Previous** returns to the prior selection. At the end of the catalog, discovery returns to the first selection. Changing the search or genre starts at selection 1.
-- **Refresh bookshelf** reloads the user’s saved books and preserves the reading-status filter. Clicking a title opens its details.
+- **Next selection** fetches the next 24 results for the current search or genre. **Previous** returns to the prior selection. At the end of the catalog, the empty view offers a reset; Previous remains available. Changing the search or genre starts at selection 1.
+- **Refresh** reloads the user’s saved books and preserves the reading-status filter. Clicking a title opens its details.
 - Existing books without an owner remain in the database but are not exposed to any account. Ownership cannot be inferred from the old shared collection; assign legacy rows only after verifying their owner.
 
 ### Sessions and API requests
 
-`GET /users/me` returns the current account from the database. Protected pages redirect expired sessions to login; protected APIs return `401` with `X-Session-Expired: true`. Administrative permissions are checked against the current database role, including after PageTurnertion or deletion.
+`GET /users/me` returns the current account from the database. Protected pages redirect expired sessions to login; protected APIs return `401` with `X-Session-Expired: true`. Administrative permissions are checked against the current database role, including after demotion or deletion.
 
-All mutation requests require CSRF protection. API clients first request `GET /api/csrf`, retain the session cookie, and send the returned `headerName` and `token` on POST, PUT, PATCH, and DELETE requests. The shared `session.js` handles this for the frontend. `PATCH /books/{id}/status` accepts a JSON body such as `{"readingStatus":"READING"}`.
+Global account administration requires SUPER_ADMIN. Sign-in and signup return 503 while Redis is unavailable. Bearer clients must sign in again after upgrading from email-based tokens.
+
+All mutation requests require CSRF protection. API clients first request `GET /api/csrf`, retain the session cookie, and send the returned `headerName` and `token` on POST, PUT, PATCH, and DELETE requests. The typed `frontend/lib/api.ts` client handles this for the frontend. `PATCH /books/{id}/status` accepts a JSON body such as `{"readingStatus":"READING"}`.
 
 ### Production setup
 
-1. Copy `.env.example` to `.env` and set your database connection and a unique `JWT_SECRET` (`openssl rand -hex 32`). The example MySQL URL is for local development; configure TLS for remote database connections.
+1. Run `make init` to generate unique database passwords and a JWT signing key. Compose connects to its private MySQL service; configure TLS when using a remote database.
 2. A fresh database has no built-in administrator. Optionally set `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` for initial creation, then remove those bootstrap variables. Existing accounts and passwords are never overwritten.
-3. Back up an existing database and apply `docs/migrations/001-private-bookshelves.sql` once, unless the development profile has already applied those schema changes. For a fresh schema, provision the base tables before applying this incremental migration. The production profile validates the schema instead of altering it automatically.
-4. Run `./mvnw verify`, then deploy the built JAR with `SPRING_PROFILES_ACTIVE=prod` behind an HTTPS reverse proxy. Secure session cookies require HTTPS. The production profile disables development tools, the H2 console, SQL logging, and detailed error output, and enables template/resource caching.
+3. Back up an existing database and apply `docs/migrations/001-private-bookshelves.sql` once, unless the development profile has already applied those schema changes. Compose initializes a fresh MySQL volume with `docs/migrations/fresh-schema.sql`, which already includes those changes. The production profile validates the schema instead of altering it automatically.
+4. Run `make test`, then deploy the Compose stack with `SPRING_PROFILES_ACTIVE=prod` and a host HTTPS reverse proxy forwarding to the loopback-only gateway at `127.0.0.1:${HOST_PORT:-8080}`. Have the TLS proxy overwrite X-Real-IP with the client address. In Nginx configure `set_real_ip_from` for that proxy’s exact observed peer address and `real_ip_header X-Real-IP`. Without this setting browsers behind the proxy share one rate limit. Secure session cookies require HTTPS. The production profile disables development tools, the H2 console, SQL logging, and detailed error output.
 5. Browser sessions are stored in application memory. A restart requires users to sign in again; multiple application instances require a shared session store before scaling horizontally.
 
 GitHub Actions runs `./mvnw verify` on Java 25. The tests include a real H2-backed API suite for ownership isolation, tampered IDs, reading statuses, CSRF, expired sessions, and role changes, plus paginated search and upstream failure tests.
@@ -152,10 +120,10 @@ GitHub Actions runs `./mvnw verify` on Java 25. The tests include a real H2-back
 
 ### Search, sorting, and reading
 
-In **My bookshelf**, search saved titles and authors, combine the search with reading-status filters, and sort by recently saved, oldest saved, title, author, or reading status. Search is case- and accent-insensitive. Refresh preserves the current controls; Reset clears them. All filtering is local to the already authorized personal collection.
+In **Your library**, search saved titles and authors, combine the search with reading-status filters, and sort by recently saved, oldest saved, title, author, reading status, or binding colour. Search is case- and accent-insensitive. Refresh preserves the current controls; Reset clears them. All filtering is local to the already authorized personal collection.
 
-**Reading options** on a book opens its details and checks its ISBN through the [Open Library Read API](https://openlibrary.org/dev/docs/api/read). Readable editions open in the provider’s reader in a new tab; borrowable editions open the provider’s borrowing page. Borrowing may require an external account, and availability is confirmed by the provider. Different-edition matches are labeled. Missing ISBNs or unavailable editions offer an Open Library edition search instead of claiming the full text is available. Provider failures offer a retry. Reading links are restricted to HTTPS Open Library and Internet Archive URLs.
+**Find a readable edition** in the open-book dialog checks its ISBN through the [Open Library Read API](https://openlibrary.org/dev/docs/api/read). Readable editions open in the provider’s reader in a new tab; borrowable editions open the provider’s borrowing page. Borrowing may require an external account, and availability is confirmed by the provider. Different-edition matches are labeled. Missing ISBNs or unavailable editions offer an Open Library edition search instead of claiming the full text is available. Provider failures offer a retry. Reading links are restricted to HTTPS Open Library and Internet Archive URLs.
 
 `GET /books/reading?isbn=…` requires authentication, validates the ISBN format, and returns reading options without storing book content or altering reading status. No database migration is required for these features.
 
-Run `node --test src/test/js/*.test.cjs` for bookshelf filtering/sorting tests, and `./mvnw test` for the Java API and reading-provider tests. Both run in CI.
+Run `npm --prefix frontend test` for bookshelf filtering/sorting tests, and `./mvnw test` for the Java API and reading-provider tests. Both run in CI.

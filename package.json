@@ -1,12 +1,10 @@
 {
-  "name": "Spring Boot PageTurner - Static Development",
-  "version": "1.0.0",
-  "description": "Frontend development setup",
+  "name": "pageturner",
+  "private": true,
   "scripts": {
-    "dev": "live-server src/main/resources/static --port=3001 --proxy=http://localhost:8080/api",
-    "start": "npm run dev"
-  },
-  "devDependencies": {
-    "live-server": "^1.2.2"
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix frontend test",
+    "start": "docker compose up --build --wait -d"
   }
 }

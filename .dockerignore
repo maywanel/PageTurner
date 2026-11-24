@@ -4,5 +4,13 @@ target
 .vscode
 .idea
 .env
+**/.env
+**/.env.*
+!.env.example
 *.log
 node_modules
+**/node_modules
+**/.next
+**/test-results
+**/playwright-report
+.impeccable

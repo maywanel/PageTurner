@@ -10,8 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import com.example.PageTurner.repository.UserRepository;
+import io.jsonwebtoken.JwtException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,11 +24,11 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
+    private final UserRepository users;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserRepository users) {
         this.jwtUtil = jwtUtil;
-        this.userDetailsService = userDetailsService;
+        this.users = users;
     }
 
     @Override
@@ -33,28 +36,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
             
         String authHeader = request.getHeader("Authorization");
-        String token = null;
-        String username = null;
-        String tenantId = null;
         try {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                int accountId;
                 try {
-                    token = authHeader.substring(7);
-                    username = jwtUtil.extractUsername(token);
-                    tenantId = jwtUtil.extractTenantId(token);
-                    if (tenantId != null)
-                        TenantContextHolder.setTenantId(tenantId);
-                } catch (Exception e) {
-                    System.err.println("Error extracting username from token: " + e.getMessage());
+                    var claims = jwtUtil.verify(authHeader.substring(7));
+                    accountId = Integer.parseInt(claims.getSubject());
+                    if (claims.getExpiration() == null) throw new IllegalArgumentException();
+                    TenantContextHolder.setTenantId(claims.get("tenantId", String.class));
+                } catch (JwtException | IllegalArgumentException invalid) {
+                    response.sendError(401);
+                    return;
                 }
-            }
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (jwtUtil.validateToken(token, username)) {
-                    UsernamePasswordAuthenticationToken authToken = 
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                var user = users.findById(accountId).orElse(null);
+                if (user == null) {
+                    response.sendError(401);
+                    return;
                 }
+                var authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
+                SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(Integer.toString(accountId), null, List.of(authority)));
             }
             filterChain.doFilter(request, response);
         } finally {
